@@ -12,7 +12,9 @@ const store = createStore({
   state: {
     events: [],
     execution: null,
-    status: 'idle'
+    status: 'idle',
+
+    test: null,
   },
   mutations: {
     onEvent(state, event) {
@@ -60,6 +62,11 @@ const store = createStore({
     },
     clearEvents(state) {
       state.events = []
+    },
+
+    onTestSelected(state, test) {
+      console.log('changing selected test', test)
+      state.test = test
     }
   }
 })

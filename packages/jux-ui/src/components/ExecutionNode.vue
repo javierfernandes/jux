@@ -2,12 +2,12 @@
     {{node.title}}
     <ul class="execution-children">
         <li v-for="child in node.children" :key="child.title">
-            <execution-node :node="child" />
+            <execution-node :node="child" @on-test-selected="onTestSelected" />
         </li>
     </ul>
     <ul class="execution-tests">
         <li v-for="test in node.tests" :key="test.fullName">
-            <execution-test :test="test" />
+            <execution-test :test="test" @on-selected="onTestSelected" />
         </li>
     </ul>
 </template>
@@ -17,8 +17,15 @@
     export default {
       name: 'ExecutionNode',
       props: ['node'],
+      emits: ['onTestSelected'],
       components: {
         ExecutionTest
+      },
+      methods: {
+        onTestSelected(test) {
+          console.log('ExecutionNode.onTestSelected')
+          this.$emit('onTestSelected', test)
+        }
       }
     }
 </script>
