@@ -13,6 +13,7 @@
     "primeicons": "^4.1.0",
     "primevue": "^3.3.5",
     "ramda": "^0.27.1",
+    "stacktrace-parser": "^0.1.10",
     "vue": "^3.0.0",
     "vuex": "4",
     "ws": "^7.4.5"

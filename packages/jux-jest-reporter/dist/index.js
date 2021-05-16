@@ -3304,6 +3304,10 @@ const createServerIfNeeded = () => {
   }
 }
 
+/**
+ * A jest test runner that accepts incoming WS connections (from the JUX UI)
+ * and forwards every Jest event to all clients.
+ */
 class JUXReporter {
 
   constructor(globalConfig, options) {

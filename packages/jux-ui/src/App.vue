@@ -7,7 +7,7 @@
       <tests-tree @on-test-selected="onTestSelected" />
     </SplitterPanel>
     <SplitterPanel :size="80" :minSize="50">
-      <Splitter layout="vertical">
+      <Splitter layout="vertical" class="vertical-splitter">
         <SplitterPanel>
           <test-detail :test="selectedTest" />
         </SplitterPanel>
@@ -74,6 +74,10 @@ export default {
   overflow: scroll;
 }
 
+.vertical-splitter {
+  width: 100%;
+}
+
 .execution-test-duration {
   color: gray;
   font-size: 0.8rem;
@@ -118,9 +122,20 @@ export default {
   padding: 1rem;
   background: #ffeeee;
   border-radius: 10px;
+  font-family: monospace;
 }
+
+/** generic stuff */
 .tab {
   padding-left: 2rem;
+}
+
+.stack-trace {
+  padding-left: 2rem;
+  font-family: monospace;
+}
+.stack-trace-item a {
+  color: #4c4cb5;
 }
 
 #app pre {
