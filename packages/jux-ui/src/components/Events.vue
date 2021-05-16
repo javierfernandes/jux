@@ -4,7 +4,7 @@
         <button @click="clear">Clear</button>
         <ol>
             <li v-for="event in events" :key="event.timestamp">
-                <pre>{{JSON.stringify(event, null, 2) }}</pre>
+                <pre class="json-content">{{JSON.stringify(event, null, 2) }}</pre>
             </li>
         </ol>
     </div>

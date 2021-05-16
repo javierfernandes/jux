@@ -4,8 +4,7 @@
   <div class="layout">
     <!--  nav bar  -->
     <div class="layout-top-bar">
-      <h2>JUX</h2>
-      <div>My Project</div>
+      <Header />
     </div>
 
     <div class="layout-content">
@@ -14,14 +13,7 @@
           <tests-tree @on-test-selected="onTestSelected" />
         </SplitterPanel>
         <SplitterPanel :size="65" :minSize="50">
-          <Splitter layout="vertical" class="vertical-splitter">
-            <SplitterPanel>
-              <test-detail :test="selectedTest" />
-            </SplitterPanel>
-            <SplitterPanel :size="20" class="padded-splitter-panel">
-              <events />
-            </SplitterPanel>
-          </Splitter>
+          <test-detail :test="selectedTest" />
         </SplitterPanel>
       </Splitter>
     </div>
@@ -33,20 +25,20 @@
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 
+import Header from '@/components/Header'
 import CommunicationLink from './components/CommunicationLink.vue'
 import TestDetail from './components/TestDetail'
 import TestsTree from './components/TestsTree'
-import Events from './components/Events'
 
 export default {
   name: 'App',
   components: {
+    Header,
     Splitter,
     SplitterPanel,
 
     CommunicationLink,
     TestsTree,
-    Events,
     TestDetail,
   },
   methods: {
@@ -259,7 +251,7 @@ body * {
   color: #b9b8b8;
 }
 
-#app pre {
+#app pre, .json-content {
   font-family: monospace;
   background-color: #f3f3f3;
   padding: 0.5rem;
