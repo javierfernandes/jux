@@ -41,6 +41,15 @@
   list-style: none;
   padding-left: 0;
 }
+.test-files ul, .test-files ol {
+  list-style: none;
+  padding-left: 1.5rem;
+}
+
+.test-files .test-status {
+  margin-right: 0.4rem;
+}
+
 
 .test-files > li:first-child .file-execution-title {
     border-top-left-radius: 5px;
@@ -51,6 +60,8 @@
     border-bottom-right-radius: 5px;
 }
 
+/* FileExecution */
+
 .file-execution-title {
     line-height: 2rem;
     background: #f3f3f3;
@@ -59,5 +70,9 @@
 
     display: flex;
     justify-content: space-between;
+}
+.file-execution-elements {
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
 }
 </style>

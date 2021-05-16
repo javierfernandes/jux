@@ -1,6 +1,9 @@
 <template>
-    <div class="execution_title">{{node.title}}</div>
-    <ul class="execution-children">
+    <div :class="`execution-title execution-title-${status}`">
+      <execution-test-status :status="status"/>
+      {{node.title}}
+    </div>
+    <ul class="execution-children" v-if="node.children.length > 0">
         <li v-for="child in node.children" :key="child.title">
             <execution-node :node="child" @on-test-selected="onTestSelected" />
         </li>
@@ -12,6 +15,8 @@
     </ul>
 </template>
 <script>
+    import ExecutionTestStatus from '@/components/ExecutionTestStatus'
+    import { statusOf } from '@/model/ExecutionNode'
     import ExecutionTest from './ExecutionTest'
 
     export default {
@@ -19,11 +24,17 @@
       props: ['node'],
       emits: ['onTestSelected'],
       components: {
+        ExecutionTestStatus,
         ExecutionTest
       },
       methods: {
         onTestSelected(test) {
           this.$emit('onTestSelected', test)
+        }
+      },
+      computed: {
+        status() {
+          return statusOf(this.node)
         }
       }
     }

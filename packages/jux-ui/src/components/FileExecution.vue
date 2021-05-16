@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <div v-if="root && expanded">
+    <div v-if="root && expanded" class="file-execution-elements">
         <ul>
             <li v-for="node in root.children" :key="node.title">
                 <execution-node :node="node" @on-test-selected="onTestSelected" />

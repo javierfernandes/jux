@@ -72,6 +72,11 @@ export default {
   url(/fonts/raleway/static/Raleway-Regular.ttf) format("truetype");
 }
 
+:root {
+  --clickable-hover-color: dodgerblue;
+  --failed-text-color: #ea6060;
+}
+
 #app {
   font-family: Raleway, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -157,15 +162,19 @@ body * {
   display: flex;
   justify-content: space-between;
 }
-.execution-test-failed {
-  color: #ea6060;
+.execution-test:hover {
+  cursor: pointer;
+  font-weight: bolder;
 }
-.execution-test .test-status {
-  margin-right: 0.4rem;
+.execution-test-failed {
+  color: var(--failed-text-color);
 }
 
-.execution_title {
+.execution-title {
   color: gray;
+}
+.execution-title.execution-title-failed {
+  color: var(--failed-text-color);
 }
 
 .test-detail .p-breadcrumb {
@@ -182,6 +191,7 @@ body * {
 
 .test-detail-content {
   padding-left: 1rem;
+  padding-right: 1rem;
   height: 100%;
   overflow: scroll;
 }
@@ -227,11 +237,11 @@ body * {
   font-family: monospace;
 }
 .stack-trace-item a {
-  color: #4c4cb5;
+  color: black;
   text-decoration: none;
 }
 .stack-trace-item a:hover {
-  color: #2323d8;
+  color: var(--clickable-hover-color)!important;
   text-decoration: none;
 }
 .stack-trace-item .file-name {
