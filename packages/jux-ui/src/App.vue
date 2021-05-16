@@ -1,23 +1,32 @@
 
 <template>
   <CommunicationLink @on-message="onEvent" />
+  <div class="layout">
+    <!--  nav bar  -->
+    <div class="layout-top-bar">
+      <h2>JUX</h2>
+      <div>My Project</div>
+    </div>
 
-  <Splitter class="content-splitter">
-    <SplitterPanel :size="35" :minSize="20">
-      <tests-tree @on-test-selected="onTestSelected" />
-    </SplitterPanel>
-    <SplitterPanel :size="65" :minSize="50">
-      <Splitter layout="vertical" class="vertical-splitter">
-        <SplitterPanel>
-          <test-detail :test="selectedTest" />
+    <div class="layout-content">
+      <Splitter class="content-splitter">
+        <SplitterPanel :size="35" :minSize="20" class="padded-splitter-panel">
+          <tests-tree @on-test-selected="onTestSelected" />
         </SplitterPanel>
-        <SplitterPanel :size="20">
-          <events />
+        <SplitterPanel :size="65" :minSize="50">
+          <Splitter layout="vertical" class="vertical-splitter">
+            <SplitterPanel>
+              <test-detail :test="selectedTest" />
+            </SplitterPanel>
+            <SplitterPanel :size="20" class="padded-splitter-panel">
+              <events />
+            </SplitterPanel>
+          </Splitter>
         </SplitterPanel>
       </Splitter>
-    </SplitterPanel>
-  </Splitter>
+    </div>
 
+  </div>
 </template>
 
 <script>
@@ -68,19 +77,45 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 1rem;
+}
+body {
+  margin: 0;
 }
 body * {
   font-family: Raleway, Avenir, Helvetica, Arial, sans-serif;
 }
 
+.p-splitter {
+  border: 0;
+}
+
+.layout {
+  background-color:  #f8f9fa;
+}
+.layout-top-bar {
+  border-bottom: 4px solid transparent;
+  display: flex;
+  height: 3rem;
+  align-items: center;
+}
+.layout-top-bar h2 {
+  margin: 0;
+  padding-left: 1rem;
+  padding-right: 2rem;
+}
+.layout-content {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
 .content-splitter {
-  border: 1px solid #d8d8f7;
-  height: 95vh;
+  height: 93vh;
 }
 .content-splitter .p-splitter-panel {
-  padding: 1rem;
   overflow: scroll;
+}
+.padded-splitter-panel.p-splitter-panel {
+  padding: 1rem;
 }
 
 .vertical-splitter {
@@ -124,6 +159,23 @@ body * {
   color: gray;
 }
 
+.test-detail .p-breadcrumb {
+  border: 0;
+  border-bottom: 2px solid #f8f9fa;
+  border-radius: 0;
+  font-size: 0.8rem;
+  padding: 0.5rem;
+}
+.test-detail .p-breadcrumb-chevron {
+  font-size: 0.5rem;
+  color: #c7c7c7;
+}
+
+.test-detail-content {
+  padding-left: 1rem;
+  height: 100%;
+  overflow: scroll;
+}
 .test-detail .test-title {
   display: flex;
   align-items: center;

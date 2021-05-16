@@ -1,44 +1,46 @@
 <template>
     <div class="test-detail" v-if="test">
-<!--        <Breadcrumb :home="home" :model="path" />-->
+      <Breadcrumb :home="home" :model="path" />
+
+      <div class="test-detail-content">
         <h2 class="test-title">
           <execution-test-status :status="test.status"/>
-            {{test?.title || 'should select a test on the left'}}
+          {{test?.title || 'should select a test on the left'}}
         </h2>
         <div v-if="test?.failureMessages?.length > 0">
-            <h4>Error</h4>
-            <div class="test-failure-messages-box">
-              <div v-for="failure in failureMessages" :key="failure.line">
-                <div v-for="line in failure.lines" :key="line">
-                  <div v-html="line" />
-                </div>
+          <h4>Error</h4>
+          <div class="test-failure-messages-box">
+            <div v-for="failure in failureMessages" :key="failure.line">
+              <div v-for="line in failure.lines" :key="line">
+                <div v-html="line" />
               </div>
             </div>
+          </div>
         </div>
 
         <div v-if="test?.failureMessages?.length > 0" class="test-failure-stack-trace">
-            <h4>Stack Trace</h4>
-            <div v-for="failure in failureMessages" :key="failure.line">
-                <div class="stack-trace">
-                    <stack-trace-frame
-                        v-for="frame in failure.stackTrace"
-                        :key="frame"
-                        :frame="frame"
-                        :rootDir="test.rootDir"
-                    />
-                </div>
+          <h4>Stack Trace</h4>
+          <div v-for="failure in failureMessages" :key="failure.line">
+            <div class="stack-trace">
+              <stack-trace-frame
+                  v-for="frame in failure.stackTrace"
+                  :key="frame"
+                  :frame="frame"
+                  :rootDir="test.rootDir"
+              />
             </div>
+          </div>
         </div>
 
         <div>
           <h4>Raw</h4>
           <pre>{{JSON.stringify(test, null, 2)}}</pre>
         </div>
-
+      </div>
     </div>
 </template>
 <script>
-// import Breadcrumb from 'primevue/breadcrumb'
+import Breadcrumb from 'primevue/breadcrumb'
 import ExecutionTestStatus from './ExecutionTestStatus'
 import AnsiUp from 'ansi_up'
 import * as stackTraceParser from 'stacktrace-parser'
@@ -52,7 +54,7 @@ export default {
   components: {
     StackTraceFrame,
     ExecutionTestStatus,
-    // Breadcrumb
+    Breadcrumb
   },
   methods: {
     parseErrorMessage(msg) {
