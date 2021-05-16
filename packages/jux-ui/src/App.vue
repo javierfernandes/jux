@@ -10,7 +10,7 @@
 
     <div class="layout-content">
       <Splitter class="content-splitter">
-        <SplitterPanel :size="35" :minSize="20" class="padded-splitter-panel">
+        <SplitterPanel :size="35" :minSize="20">
           <tests-tree @on-test-selected="onTestSelected" />
         </SplitterPanel>
         <SplitterPanel :size="65" :minSize="50">
@@ -120,6 +120,14 @@ body * {
 
 .vertical-splitter {
   width: 100%;
+}
+
+.execution-summary {
+  display: flex;
+  background: #f9caca; /* only when failed */
+  padding: 1rem;
+  
+  justify-content: space-between;
 }
 
 .file-execution-summary {

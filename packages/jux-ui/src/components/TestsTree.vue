@@ -1,11 +1,7 @@
 <template>
-    <h1>Status</h1>
-    State: {{status}}
+    <execution-summary :execution="execution" />
 
     <div v-if="result">
-        {{result.numPassedTestSuites}} / {{result.numTotalTestSuites}} suites
-        {{result.numPassedTests}} / {{result.numTotalTests}} tests
-
         <ul class="test-files">
             <li v-for="file in execution.files" :key="file.path">
                 <file-execution :file="file" @on-test-selected="testSelected" />
@@ -14,18 +10,17 @@
     </div>
 </template>
 <script>
+    import ExecutionSummary from '@/components/ExecutionSummary'
     import FileExecution from './FileExecution'
 
     export default {
       name: 'TestsTree',
       emits: ['onTestSelected'],
       components: {
+        ExecutionSummary,
         FileExecution,
       },
       computed: {
-        status() {
-          return this.$store.state.status
-        },
         execution() {
           return this.$store.state.execution
         },
@@ -42,8 +37,9 @@
 </script>
 <style>
 .test-files {
-    list-style: none;
-    padding-left: 0;
+  margin-top: 0;
+  list-style: none;
+  padding-left: 0;
 }
 
 .test-files > li:first-child .file-execution-title {
