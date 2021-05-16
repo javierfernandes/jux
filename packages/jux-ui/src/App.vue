@@ -119,6 +119,7 @@ body * {
 .content-splitter .p-splitter-panel {
   overflow: scroll;
 }
+
 .padded-splitter-panel.p-splitter-panel {
   padding: 1rem;
 }
@@ -134,6 +135,10 @@ body * {
   padding-left: 1rem;
 
   background: #d2d1d1;
+
+  position: sticky;
+  top: 0px;
+  z-index: 1;
 }
 
 .file-execution-summary {
