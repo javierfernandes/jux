@@ -2,13 +2,21 @@
   <div class="execution-summary">
     <div>{{status}}</div>
     <div class="counters">
-      <div class="counter-box failed">{{result.numFailedTests || '-'}} fails</div>
-      <div class="counter-box passed">{{result.numPassedTests || '-'}} ok</div>
-      <div class="counter-box skipped">{{result.numPendingTests || '-'}} skips</div>
+      <div class="counter-box failed">
+        {{result.numFailedTests || '-'}} failed
+        <div class="counter-box-bottom-line">{{result.numFailedTestSuites || '-'}} {{failedSuitesLabel}}</div>
+      </div>
+      <div class="counter-box passed">
+        {{result.numPassedTests || '-'}} ok
+        <div class="counter-box-bottom-line">{{result.numPassedTestSuites || '-'}} {{passedSuitesLabel}}</div>
+      </div>
+      <div class="counter-box skipped">{{result.numPendingTests || '-'}} skipped</div>
     </div>
   </div>
 </template>
 <script>
+import pluralize from 'pluralize'
+
 export default {
   name: 'ExecutionSummary',
   props: ['execution'],
@@ -18,6 +26,12 @@ export default {
     },
     result() {
       return this.execution?.result || {}
+    },
+    failedSuitesLabel(){
+      return pluralize('suite', this.result.numFailedTestSuites)
+    },
+    passedSuitesLabel(){
+      return pluralize('suite', this.result.numPassedTestSuites)
     }
   }
 }
@@ -35,9 +49,12 @@ export default {
   background-color: green;
 }
 .counter-box.failed {
-  background-color: red;
+  background-color: var(--failed-text-color);
 }
 .counter-box.skipped {
   background-color: gray;
+}
+.counter-box-bottom-line {
+  font-size: 0.7rem;
 }
 </style>

@@ -3,8 +3,8 @@
         <file-path :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
         <div v-if="file.state === 'completed'" class="file-execution-summary">
           <file-execution-result-summary :result="file.result" />
-          <execution-duration :duration="file.result.perfStats.runtime" />
         </div>
+        <execution-duration :duration="file.result.perfStats.runtime" />
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">

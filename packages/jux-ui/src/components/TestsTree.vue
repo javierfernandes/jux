@@ -45,6 +45,9 @@
   list-style: none;
   padding-left: 1.5rem;
 }
+.test-files > li:not(:first-child) {
+  border-top: 1px solid #c1c1c1;
+}
 
 .test-files .test-status {
   margin-right: 0.4rem;
