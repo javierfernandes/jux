@@ -36,6 +36,7 @@ class JUXReporter {
     this._globalConfig = globalConfig;
     this._options = options;
 
+    console.log('Instantiated JUXReporter')
     createServerIfNeeded()
   }
 

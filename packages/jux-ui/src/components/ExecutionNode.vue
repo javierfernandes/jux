@@ -1,5 +1,5 @@
 <template>
-    {{node.title}}
+    <div class="execution_title">{{node.title}}</div>
     <ul class="execution-children">
         <li v-for="child in node.children" :key="child.title">
             <execution-node :node="child" @on-test-selected="onTestSelected" />
@@ -23,7 +23,6 @@
       },
       methods: {
         onTestSelected(test) {
-          console.log('ExecutionNode.onTestSelected')
           this.$emit('onTestSelected', test)
         }
       }

@@ -1,6 +1,10 @@
 <template>
-    <div @click="onSelected">
-        <execution-test-status :test="test"/> {{test.title}} <execution-duration :duration="test.duration" />
+    <div @click="onSelected" :class="`execution-test execution-test-${test.status}`">
+        <div>
+            <execution-test-status :test="test"/>
+            {{test.title}}
+        </div>
+        <execution-duration :duration="test.duration" />
     </div>
 </template>
 <script>
@@ -17,7 +21,6 @@
     },
     methods: {
       onSelected() {
-        console.log('ExecutionTest.onSelected')
         this.$emit('onSelected', this.test)
       }
     }

@@ -65,7 +65,6 @@ const store = createStore({
     },
 
     onTestSelected(state, test) {
-      console.log('changing selected test', test)
       state.test = test
     }
   }

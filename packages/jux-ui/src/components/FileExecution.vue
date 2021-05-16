@@ -75,7 +75,6 @@
         this.expanded = !this.expanded
       },
       onTestSelected(test) {
-        console.log('FileExecution.testSelected')
         this.$emit('onTestSelected', test)
       }
     }

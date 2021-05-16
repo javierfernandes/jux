@@ -8,12 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "ansi_up": "^5.0.1",
     "core-js": "^3.6.5",
     "primeicons": "^4.1.0",
     "primevue": "^3.3.5",
     "ramda": "^0.27.1",
     "vue": "^3.0.0",
-    "vue-json-pretty": "^1.8.0",
     "vuex": "4",
     "ws": "^7.4.5"
   },

@@ -35,7 +35,6 @@
       },
       methods: {
         testSelected(test) {
-          console.log('TestsTree.testSelected()')
           this.$emit('onTestSelected', test)
         }
       }

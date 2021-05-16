@@ -3,16 +3,15 @@
   <CommunicationLink @on-message="onEvent" />
 
   <Splitter class="content-splitter">
-    <SplitterPanel>
+    <SplitterPanel :size="35" :minSize="20">
       <tests-tree @on-test-selected="onTestSelected" />
     </SplitterPanel>
-    <SplitterPanel>
+    <SplitterPanel :size="80" :minSize="50">
       <Splitter layout="vertical">
         <SplitterPanel>
-          TEST
-          <pre v-if="selectedTest">{{JSON.stringify(selectedTest, null, 2)}}</pre>
+          <test-detail :test="selectedTest" />
         </SplitterPanel>
-        <SplitterPanel>
+        <SplitterPanel :size="20">
           <events />
         </SplitterPanel>
       </Splitter>
@@ -25,8 +24,9 @@
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 
-import TestsTree from './components/TestsTree'
 import CommunicationLink from './components/CommunicationLink.vue'
+import TestDetail from './components/TestDetail'
+import TestsTree from './components/TestsTree'
 import Events from './components/Events'
 
 export default {
@@ -38,13 +38,13 @@ export default {
     CommunicationLink,
     TestsTree,
     Events,
+    TestDetail,
   },
   methods: {
     onEvent(event) {
       this.$store.commit('onEvent', event)
     },
     onTestSelected(test) {
-      console.log('App.onTestSelected')
       this.$store.commit('onTestSelected', test)
     }
   },
@@ -78,8 +78,49 @@ export default {
   color: gray;
   font-size: 0.8rem;
 }
+
+.execution-children {
+  padding-inline-start: 1rem;
+}
 .execution-tests {
   list-style: none;
+  padding-inline-start: 1rem;
+}
+.execution-tests li {
+  line-height: 1.5rem;
+}
+
+.execution-test {
+  display: flex;
+  justify-content: space-between;
+}
+.execution-test-failed {
+  color: #ea6060;
+}
+.execution-test .test-status {
+  margin-right: 0.4rem;
+}
+
+.execution_title {
+  color: gray;
+}
+
+.test-detail .test-title {
+  display: flex;
+  align-items: center;
+}
+.test-detail .test-title .test-status {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.4rem;
+}
+.test-detail .test-failure-messages-box {
+  padding: 1rem;
+  background: #ffeeee;
+  border-radius: 10px;
+}
+.tab {
+  padding-left: 2rem;
 }
 
 #app pre {
