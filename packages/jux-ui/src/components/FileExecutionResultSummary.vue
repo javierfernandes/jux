@@ -1,6 +1,6 @@
 <template>
   <span class="count-failing">{{result.numFailingTests}}</span>
-  <span class="count-skipped">{{result.numFailingTests}}</span>
+  <span class="count-pending">{{result.numPendingTests}}</span>
   <span class="count-passed">{{result.numPassingTests}}</span>
 </template>
 <script>
@@ -16,7 +16,7 @@ export default {
 .count-passed {
   color: green;
 }
-.count-skipped {
+.count-pending {
   color: gray;
 }
 </style>

@@ -124,10 +124,11 @@ body * {
 
 .execution-summary {
   display: flex;
-  background: #f9caca; /* only when failed */
-  padding: 1rem;
-  
   justify-content: space-between;
+  align-items: center;
+  padding-left: 1rem;
+
+  background: #d2d1d1;
 }
 
 .file-execution-summary {
