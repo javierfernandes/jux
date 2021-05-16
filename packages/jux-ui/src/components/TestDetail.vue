@@ -65,9 +65,9 @@ export default {
     home() { return { label: this.test?.ancestorTitles[0] } },
     path() { return this.test?.ancestorTitles.slice(1).map(label => ({ label })) || [] },
     failureMessages() {
-      return this.test?.failureMessages?.map(msg => ({
-        lines: this.parseErrorMessage(msg),
-        stackTrace: stackTraceParser.parse(msg)
+      return this.test?.failureDetails?.map(failure => ({
+        lines: this.parseErrorMessage(failure.message),
+        stackTrace: stackTraceParser.parse(failure.stack)
       }))
     },
   }
