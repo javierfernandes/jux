@@ -2,7 +2,7 @@
     <div class="test-detail" v-if="test">
 <!--        <Breadcrumb :home="home" :model="path" />-->
         <h2 class="test-title">
-            <execution-test-status :test="test" />
+          <execution-test-status :status="test.status"/>
             {{test?.title || 'should select a test on the left'}}
         </h2>
         <div v-if="test?.failureMessages?.length > 0">

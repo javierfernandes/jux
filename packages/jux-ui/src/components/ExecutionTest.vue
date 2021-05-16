@@ -1,7 +1,7 @@
 <template>
     <div @click="onSelected" :class="`execution-test execution-test-${test.status}`">
         <div>
-            <execution-test-status :test="test"/>
+            <execution-test-status :status="test.status"/>
             {{test.title}}
         </div>
         <execution-duration :duration="test.duration" />

@@ -1,9 +1,10 @@
 <template>
     <div class="file-execution-title">
         <file-path :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
-        <span v-if="file.state === 'completed'">
-            <execution-duration :duration="file.result.perfStats.runtime" />
-        </span>
+        <div v-if="file.state === 'completed'" class="file-execution-summary">
+          <file-execution-result-summary :result="file.result" />
+          <execution-duration :duration="file.result.perfStats.runtime" />
+        </div>
     </div>
 
     <div v-if="root && expanded">
@@ -20,6 +21,7 @@
   import { omit, propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
   import ExecutionDuration from './ExecutionDuration'
+  import FileExecutionResultSummary from '@/components/FileExecutionResultSummary'
   import FilePath from './FilePath'
 
   const createTestsTree = (rootDir, results) => {
@@ -64,6 +66,7 @@
       }
     },
     components: {
+      FileExecutionResultSummary,
       ExecutionNode,
       ExecutionDuration,
       FilePath,
@@ -73,6 +76,10 @@
       root() {
         return this.file.state === 'completed' ?
           createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
+      },
+      numberFailingTests() {
+        console.log('file', this.file.path, 'results', JSON.stringify(this.file.result,null,2))
+        return 0
       }
     },
     methods: {

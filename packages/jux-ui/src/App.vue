@@ -6,7 +6,7 @@
     <SplitterPanel :size="35" :minSize="20">
       <tests-tree @on-test-selected="onTestSelected" />
     </SplitterPanel>
-    <SplitterPanel :size="80" :minSize="50">
+    <SplitterPanel :size="65" :minSize="50">
       <Splitter layout="vertical" class="vertical-splitter">
         <SplitterPanel>
           <test-detail :test="selectedTest" />
@@ -87,6 +87,12 @@ body * {
   width: 100%;
 }
 
+.file-execution-summary {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-evenly;
+}
+
 .execution-test-duration {
   color: gray;
   font-size: 0.8rem;
@@ -132,6 +138,22 @@ body * {
   background: #ffeeee;
   border-radius: 10px;
   font-family: monospace;
+}
+
+.test-status {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 20px;
+}
+.status-passed {
+  background: green;
+}
+.status-failed {
+  background: red;
+}
+.status-skipped {
+  background: gray;
 }
 
 /** generic stuff */
