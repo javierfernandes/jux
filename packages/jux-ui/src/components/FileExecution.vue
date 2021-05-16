@@ -22,7 +22,7 @@
   import ExecutionDuration from './ExecutionDuration'
   import FilePath from './FilePath'
 
-  const createTestsTree = results => {
+  const createTestsTree = (rootDir, results) => {
     // TODO: this should probably be a logic on the state
     const r = results.reduce((node, result) => {
       result.ancestorTitles.reduce((parent, ancestor, i) => {
@@ -36,7 +36,12 @@
           parent.children.push(existing)
         }
         if (i === result.ancestorTitles.length - 1) {
-          existing.tests.push(result)
+          existing.tests.push({
+            // this is probably a hack ! we should have rootDir in the store
+            // as a context value for the current project/test runner
+            rootDir,
+            ...result
+          })
         }
         return existing
       }, node)
@@ -67,7 +72,7 @@
       shortFile() { return omit(['context'], this.file) },
       root() {
         return this.file.state === 'completed' ?
-          createTestsTree(this.file.result.testResults) : undefined
+          createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
       }
     },
     methods: {

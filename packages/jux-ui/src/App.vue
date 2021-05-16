@@ -57,12 +57,21 @@ export default {
 </script>
 
 <style>
+@font-face {
+  font-family: "Raleway";
+  src: local("Raleway"),
+  url(/fonts/raleway/static/Raleway-Regular.ttf) format("truetype");
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Raleway, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   margin-top: 1rem;
+}
+body * {
+  font-family: Raleway, Avenir, Helvetica, Arial, sans-serif;
 }
 
 .content-splitter {
@@ -136,9 +145,24 @@ export default {
 }
 .stack-trace-item a {
   color: #4c4cb5;
+  text-decoration: none;
+}
+.stack-trace-item a:hover {
+  color: #2323d8;
+  text-decoration: none;
+}
+.stack-trace-item .file-name {
+  font-weight: bold;
+}
+.stack-trace-item-external {
+  color: #b9b8b8;
+}
+.stack-trace-item-external a {
+  color: #b9b8b8;
 }
 
 #app pre {
+  font-family: monospace;
   background-color: #f3f3f3;
   padding: 0.5rem;
   border-radius: 5px;

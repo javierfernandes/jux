@@ -20,7 +20,12 @@
             <h4>Stack Trace</h4>
             <div v-for="failure in failureMessages" :key="failure.line">
                 <div class="stack-trace">
-                    <stack-trace-frame v-for="frame in failure.stackTrace" :key="frame" :frame="frame"/>
+                    <stack-trace-frame
+                        v-for="frame in failure.stackTrace"
+                        :key="frame"
+                        :frame="frame"
+                        :rootDir="test.rootDir"
+                    />
                 </div>
             </div>
         </div>
