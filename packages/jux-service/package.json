@@ -1,0 +1,11 @@
+{
+  "name": "jux-service",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Javier Fernandes <javier.fernandes@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^8.3.2",
+    "ws": "^7.4.5"
+  }
+}
