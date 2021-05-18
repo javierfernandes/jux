@@ -1,6 +1,13 @@
 <template>
   <h2>JUX</h2>
-  <div>{{projectName}}</div>
+  <div>
+    {{projectName}}
+    <Badge
+        :value="projectErrors"
+        v-if="projectErrors && projectErrors > 0"
+        severity="danger"
+    />
+  </div>
   <div class="debug">
     <Button label="debug" class="p-button-link" @click="debugVisible = true" />
   </div>
@@ -14,6 +21,7 @@
 import Events from '@/components/Events'
 import Button from 'primevue/button'
 import Sidebar from 'primevue/sidebar'
+import Badge from 'primevue/badge'
 
 export default {
   name: 'Header',
@@ -21,6 +29,7 @@ export default {
     Events,
     Button,
     Sidebar,
+    Badge,
   },
   data() {
     return {
@@ -31,6 +40,9 @@ export default {
     projectName() {
       const rootDir = this.$store.state.context?.globalConfig?.rootDir
       return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : '< No Project >'
+    },
+    projectErrors() {
+      return this.$store.state.execution?.result.numFailedTests
     }
   }
 }
