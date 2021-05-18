@@ -1,24 +1,25 @@
 
 <template>
-  <CommunicationLink @on-message="onEvent" />
-  <div class="layout">
-    <!--  nav bar  -->
-    <div class="layout-top-bar">
-      <Header />
-    </div>
+  <CommunicationLink @on-message="onEvent">
+    <div class="layout">
+      <!--  nav bar  -->
+      <div class="layout-top-bar">
+        <Header />
+      </div>
 
-    <div class="layout-content">
-      <Splitter class="content-splitter">
-        <SplitterPanel :size="35" :minSize="20">
-          <tests-tree @on-test-selected="onTestSelected" />
-        </SplitterPanel>
-        <SplitterPanel :size="65" :minSize="50">
-          <test-detail :test="selectedTest" />
-        </SplitterPanel>
-      </Splitter>
-    </div>
+      <div class="layout-content">
+        <Splitter class="content-splitter">
+          <SplitterPanel :size="35" :minSize="20">
+            <tests-tree @on-test-selected="onTestSelected" />
+          </SplitterPanel>
+          <SplitterPanel :size="65" :minSize="50">
+            <test-detail :test="selectedTest" />
+          </SplitterPanel>
+        </Splitter>
+      </div>
 
-  </div>
+    </div>
+  </CommunicationLink>
 </template>
 
 <script>

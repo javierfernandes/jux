@@ -9,13 +9,15 @@
         </h2>
         <div v-if="test?.failureMessages?.length > 0">
           <h4>Error</h4>
-          <div class="test-failure-messages-box">
+
             <div v-for="failure in failureMessages" :key="failure.line">
-              <div v-for="line in failure.lines" :key="line">
-                <div v-html="line" />
+              <failure-source-code :failure="failure" />
+              <div class="test-failure-messages-box">
+                <div v-for="line in failure.lines" :key="line">
+                  <div v-html="line" />
+                </div>
               </div>
             </div>
-          </div>
         </div>
 
         <div v-if="test?.failureMessages?.length > 0" class="test-failure-stack-trace">
@@ -40,6 +42,7 @@
     </div>
 </template>
 <script>
+import FailureSourceCode from '@/components/FailureSourceCode'
 import Breadcrumb from 'primevue/breadcrumb'
 import ExecutionTestStatus from './ExecutionTestStatus'
 import AnsiUp from 'ansi_up'
@@ -52,6 +55,7 @@ export default {
   name: 'TestDetail',
   props: ['test'],
   components: {
+    FailureSourceCode,
     StackTraceFrame,
     ExecutionTestStatus,
     Breadcrumb
@@ -61,7 +65,7 @@ export default {
       return msg.split('\n')
           .map(line => converter.ansi_to_html(line))
           .map(lineDiv => lineDiv.replace('    ', '<i class="tab"/>'))
-    }
+    },
   },
   computed: {
     home() { return { label: this.test?.ancestorTitles[0] } },

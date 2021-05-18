@@ -1,7 +1,17 @@
 const { propOr, pipe, map, applySpec, prop, pick, filter, propEq, drop, take, dropLast } = require('ramda')
 const WebSocket = require('ws')
+const fs = require('fs')
 
 let server
+
+const handlers = {
+  fetchSourceCode: (req, reply) => {
+    const { file, lineNumber, column } = req
+    fs.readFile(file, 'utf8' , (err, data) => {
+      reply(data)
+    })
+  }
+}
 
 const createServerIfNeeded = () => {
   if (server) return
@@ -13,9 +23,18 @@ const createServerIfNeeded = () => {
   })
   wss.on('connection', ws => {
     console.log('<<< Connected to browser/client !')
-    ws.on('message', message => {
-      console.log('received: %s', message)
+
+    ws.on('message', messageString => {
+      const message = JSON.parse(messageString)
+      const { type, id } = message
+      const handler = handlers[type]
+      if (handler) {
+        handler(message, response => {
+          ws.send(JSON.stringify({ type: 'response', id, value: response }))
+        })
+      }
     })
+
   })
 
   server = {
