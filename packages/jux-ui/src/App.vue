@@ -1,6 +1,10 @@
 
 <template>
-  <CommunicationLink @on-message="onEvent">
+  <CommunicationLink
+      @on-message="onEvent"
+      @on-instance-connected="onConnected"
+      @on-disconnected="onDisconnected"
+  >
     <div class="layout">
       <!--  nav bar  -->
       <div class="layout-top-bar">
@@ -25,6 +29,7 @@
 <script>
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
+import 'vue-json-pretty/lib/styles.css'
 
 import Header from '@/components/Header'
 import CommunicationLink from './components/CommunicationLink.vue'
@@ -43,9 +48,17 @@ export default {
     TestDetail,
   },
   methods: {
+    // connection events
     onEvent(event) {
       this.$store.commit('onEvent', event)
     },
+    onConnected(context) {
+      this.$store.commit('onConnected', context)
+    },
+    onDisconnected() {
+      this.$store.commit('onDisconnected')
+    },
+    // ui
     onTestSelected(test) {
       this.$store.commit('onTestSelected', test)
     }
@@ -253,13 +266,23 @@ body * {
 }
 
 #app pre, .json-content {
-  font-family: monospace;
   background-color: #f3f3f3;
   padding: 0.5rem;
   border-radius: 5px;
   overflow: scroll;
 }
+.json-content * {
+  font-family: monospace;
+}
 .eventsLog  li {
   text-align: left;
+}
+
+.ace_editor {
+  border-radius: 5px;
+  border: 1px solid lightgray;
+}
+.ace_editor * {
+  font-family: monospace;
 }
 </style>

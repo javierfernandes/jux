@@ -36,14 +36,15 @@
 
         <div>
           <h4>Raw</h4>
-          <pre>{{JSON.stringify(test, null, 2)}}</pre>
+          <vue-json-pretty class="json-content" :data="test" />
         </div>
       </div>
     </div>
 </template>
 <script>
-import FailureSourceCode from '@/components/FailureSourceCode'
+import VueJsonPretty from 'vue-json-pretty'
 import Breadcrumb from 'primevue/breadcrumb'
+import FailureSourceCode from '@/components/FailureSourceCode'
 import ExecutionTestStatus from './ExecutionTestStatus'
 import AnsiUp from 'ansi_up'
 import * as stackTraceParser from 'stacktrace-parser'
@@ -58,7 +59,8 @@ export default {
     FailureSourceCode,
     StackTraceFrame,
     ExecutionTestStatus,
-    Breadcrumb
+    Breadcrumb,
+    VueJsonPretty,
   },
   methods: {
     parseErrorMessage(msg) {

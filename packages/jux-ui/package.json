@@ -16,6 +16,8 @@
     "ramda": "^0.27.1",
     "stacktrace-parser": "^0.1.10",
     "vue": "^3.0.0",
+    "vue-json-pretty": "^2.0.2",
+    "vue3-ace-editor": "^2.0.2",
     "vuex": "4",
     "ws": "^7.4.5"
   },
@@ -40,7 +42,10 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "no-debugger": "warn",
+      "no-unused-vars": "warn"
+    }
   },
   "browserslist": [
     "> 1%",

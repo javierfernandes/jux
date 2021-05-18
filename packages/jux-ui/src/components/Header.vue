@@ -1,6 +1,6 @@
 <template>
   <h2>JUX</h2>
-  <div>My Project</div>
+  <div>{{projectName}}</div>
   <div class="debug">
     <Button label="debug" class="p-button-link" @click="debugVisible = true" />
   </div>
@@ -25,6 +25,12 @@ export default {
   data() {
     return {
       debugVisible: false,
+    }
+  },
+  computed: {
+    projectName() {
+      const rootDir = this.$store.state.context?.globalConfig?.rootDir
+      return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : '< No Project >'
     }
   }
 }

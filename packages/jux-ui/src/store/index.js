@@ -10,6 +10,8 @@ const EventType = {
 
 const store = createStore({
   state: {
+    connectionState: 'disconnected',
+    context: null,
     events: [],
     execution: null,
     status: 'idle',
@@ -63,7 +65,15 @@ const store = createStore({
     clearEvents(state) {
       state.events = []
     },
+    onConnected(state, context) {
+      state.connectionState = 'connected'
+      state.context = context
+    },
+    onDisconnected(state) {
+      state.connectionState = 'disconnected'
+    },
 
+    // ui state
     onTestSelected(state, test) {
       state.test = test
     }

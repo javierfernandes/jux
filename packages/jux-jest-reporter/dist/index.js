@@ -3274,20 +3274,12 @@ module.exports = of;
 
 const { propOr, pipe, map, applySpec, prop, pick, filter, propEq, drop, take, dropLast } = __webpack_require__(61)
 const WebSocket = __webpack_require__(673)
-const fs = __webpack_require__(747)
+const Protocol = __webpack_require__(804)
+const RequestHandler = __webpack_require__(398)
 
 let server
 
-const handlers = {
-  fetchSourceCode: (req, reply) => {
-    const { file, lineNumber, column } = req
-    fs.readFile(file, 'utf8' , (err, data) => {
-      reply(data)
-    })
-  }
-}
-
-const createServerIfNeeded = () => {
+const createServerIfNeeded = context => {
   if (server) return
 
   console.log('Firing up JUX server')
@@ -3298,14 +3290,23 @@ const createServerIfNeeded = () => {
   wss.on('connection', ws => {
     console.log('<<< Connected to browser/client !')
 
-    ws.on('message', messageString => {
+    const reply = (id, value) => {
+      ws.send(JSON.stringify({
+        type: Protocol.Type.RESPONSE, id, value
+      }))
+    }
+
+    ws.on('message', async messageString => {
       const message = JSON.parse(messageString)
       const { type, id } = message
-      const handler = handlers[type]
+      const handler = RequestHandler[type]
       if (handler) {
-        handler(message, response => {
-          ws.send(JSON.stringify({ type: 'response', id, value: response }))
-        })
+        try {
+          const value = await handler(message, context)
+          reply(id, value)
+        } catch(err) {
+
+        }
       }
     })
 
@@ -3330,11 +3331,14 @@ const createServerIfNeeded = () => {
 class JUXReporter {
 
   constructor(globalConfig, options) {
-    this._globalConfig = globalConfig;
-    this._options = options;
+    this._globalConfig = globalConfig
+    this._options = options
 
     console.log('Instantiated JUXReporter')
-    createServerIfNeeded()
+    createServerIfNeeded({
+      globalConfig,
+      options
+    })
   }
 
   send(msg) {
@@ -9275,7 +9279,44 @@ module.exports = paths;
 /* 395 */,
 /* 396 */,
 /* 397 */,
-/* 398 */,
+/* 398 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const fs = __webpack_require__(747)
+
+/**
+ * API for incoming requests.
+ * Keys are the "type" of the WS message.
+ * For example:
+ *   { type: "fetchSourceCode", file: "/Myfile.txt" }
+ *
+ * Will invoke the handler here with `fetchSourceCode` name and the request
+ * will contain `file` field.
+ * Return a value to respond. Or make it fail to send a failure response.
+ * Functions support Promises
+ */
+const RequestHandler = {
+
+  getContext: (req, context) => {
+    return context
+  },
+
+  fetchSourceCode: req => new Promise((resolve, reject) => {
+    const { file } = req
+    fs.readFile(file, 'utf8' , (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(data)
+      }
+    })
+  })
+
+}
+
+module.exports = RequestHandler
+
+/***/ }),
 /* 399 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -17841,7 +17882,20 @@ module.exports = Number.isInteger || function _isInteger(n) {
 
 /***/ }),
 /* 803 */,
-/* 804 */,
+/* 804 */
+/***/ (function(module) {
+
+
+const Protocol = {
+  Type: {
+    REQUEST: 'request',
+    RESPONSE: 'response'
+  }
+}
+
+module.exports = Protocol
+
+/***/ }),
 /* 805 */,
 /* 806 */,
 /* 807 */,

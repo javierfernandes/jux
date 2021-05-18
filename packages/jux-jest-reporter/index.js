@@ -1,19 +1,11 @@
 const { propOr, pipe, map, applySpec, prop, pick, filter, propEq, drop, take, dropLast } = require('ramda')
 const WebSocket = require('ws')
-const fs = require('fs')
+const Protocol = require('./Protocol')
+const RequestHandler = require('./RequestHandler')
 
 let server
 
-const handlers = {
-  fetchSourceCode: (req, reply) => {
-    const { file, lineNumber, column } = req
-    fs.readFile(file, 'utf8' , (err, data) => {
-      reply(data)
-    })
-  }
-}
-
-const createServerIfNeeded = () => {
+const createServerIfNeeded = context => {
   if (server) return
 
   console.log('Firing up JUX server')
@@ -24,14 +16,23 @@ const createServerIfNeeded = () => {
   wss.on('connection', ws => {
     console.log('<<< Connected to browser/client !')
 
-    ws.on('message', messageString => {
+    const reply = (id, value) => {
+      ws.send(JSON.stringify({
+        type: Protocol.Type.RESPONSE, id, value
+      }))
+    }
+
+    ws.on('message', async messageString => {
       const message = JSON.parse(messageString)
       const { type, id } = message
-      const handler = handlers[type]
+      const handler = RequestHandler[type]
       if (handler) {
-        handler(message, response => {
-          ws.send(JSON.stringify({ type: 'response', id, value: response }))
-        })
+        try {
+          const value = await handler(message, context)
+          reply(id, value)
+        } catch(err) {
+
+        }
       }
     })
 
@@ -56,11 +57,14 @@ const createServerIfNeeded = () => {
 class JUXReporter {
 
   constructor(globalConfig, options) {
-    this._globalConfig = globalConfig;
-    this._options = options;
+    this._globalConfig = globalConfig
+    this._options = options
 
     console.log('Instantiated JUXReporter')
-    createServerIfNeeded()
+    createServerIfNeeded({
+      globalConfig,
+      options
+    })
   }
 
   send(msg) {
