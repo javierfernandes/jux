@@ -11,7 +11,7 @@
     <div class="layout">
       <!--  nav bar  -->
       <div class="layout-top-bar">
-        <Header />
+        <Header :currentReporterId="currentReporter" @on-reporter-selected="onReporterSelected"/>
       </div>
 
       <div class="layout-content">
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { head } from 'ramda'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import 'vue-json-pretty/lib/styles.css'
@@ -50,7 +51,26 @@ export default {
     TestsTree,
     TestDetail,
   },
+  data() {
+    return {
+      selectedReporter: null,
+    }
+  },
+  computed: {
+    currentReporter() {
+      return this.selectedReporter || head(Object.values(this.$store.state.reporters))?.id
+    },
+    selectedTest() {
+      return this.$store.state.test
+    }
+  },
   methods: {
+    //
+    onReporterSelected(reporter) {
+      console.log('App.onReporterSelected', reporter)
+      this.$data.selectedReporter = reporter.id
+    },
+
     // connection events
     onEvent(event) {
       this.$store.commit('onEvent', event)
@@ -75,11 +95,6 @@ export default {
       this.$store.commit('onTestSelected', test)
     }
   },
-  computed: {
-    selectedTest() {
-      return this.$store.state.test
-    }
-  }
 }
 </script>
 

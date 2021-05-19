@@ -39,16 +39,6 @@ const store = createStore({
       state.events = [...state.events, event]
 
       switch(event.type) {
-        case EventType.onRunStart: {
-          state.status = 'running'
-          // make a new execution
-          state.execution = {
-            startTime: event.aggregatedResults.startTime,
-            numTotalTestSuites: event.aggregatedResults.numTotalTestSuites,
-            files: []
-          }
-          break
-        }
         case EventType.onRunComplete: {
           state.status = 'idle'
           state.execution.result = event.results
@@ -86,13 +76,17 @@ const store = createStore({
       state.connectionState = 'disconnected'
     },
     onAcceptReporters(state, reporters) {
-      // TODO: make a factory fn / constructor to setup Reporter fields
-      state.reporters = reporters.reduce((acc, reporter) => assoc(reporter.id, reporter, acc), {})
+      state.reporters = reporters.reduce((acc, reporter) => assoc(reporter.id, {
+        ...reporter,
+        events: [],
+        status: 'idle',
+      }, acc), {})
     },
     onReporterAdded(state, reporterId) {
-      // TODO: make a factory fn / constructor to setup Reporter fields
       state.reporters[reporterId] = {
-        id: reporterId
+        id: reporterId,
+        events: [],
+        status: 'idle',
       }
     },
 
@@ -101,6 +95,11 @@ const store = createStore({
     //
     onReporterMessage(state, { reporterId, message }) {
       const { type, ...payload } = message
+
+      // keep a record of all messages (maybe just for debugging or development)
+      state.reporters[reporterId].events.push(message)
+
+      // now handle each individually
       const handler = ReporterMessageHandlers[type]
       if (handler) {
         handler(state, reporterId, payload)
@@ -138,6 +137,16 @@ const ReporterMessageHandlers = {
 
   identifyReporter(state, reporterId, { context }) {
     state.reporters[reporterId].context = context
+  },
+
+  onRunStart(state, reporterId, { aggregatedResults }) {
+    state.reporters[reporterId].status = 'running'
+    // make a new execution
+    state.reporters[reporterId].execution = {
+      startTime: aggregatedResults.startTime,
+      numTotalTestSuites: aggregatedResults.numTotalTestSuites,
+      files: []
+    }
   }
 
 }

@@ -14,7 +14,7 @@ import JuxServiceConnection from '../api/JuxServiceConnection'
       'onMessage',
       'onDisconnected',
       'onReporterAdded',
-      'onIdentifyReporter',
+      'onReporterMessage',
     ],
 
     setup() {

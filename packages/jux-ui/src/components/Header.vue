@@ -2,7 +2,11 @@
   <h2>JUX</h2>
   <div class="reporters-header">
     <div v-for="reporter in reporters" :key="reporter.id">
-      <reporter-tab :reporter="reporter" />
+      <reporter-tab
+          :reporter="reporter"
+          @on-selected="onReporterSelected"
+          :is-current="reporter.id === currentReporterId"
+      />
       <!--   TODO: fix badge, move to ReporterTab -->
       <Badge
           :value="projectErrors"
@@ -29,6 +33,8 @@ import Badge from 'primevue/badge'
 
 export default {
   name: 'Header',
+  props: ['currentReporterId'],
+  emits: ['onReporterSelected'],
   components: {
     ReporterTab,
     Events,
@@ -41,11 +47,13 @@ export default {
       debugVisible: false,
     }
   },
+  methods: {
+    onReporterSelected(reporter) {
+      console.log('Header.onReporterSelected', reporter)
+      this.$emit('onReporterSelected', reporter)
+    }
+  },
   computed: {
-    projectName() {
-      const rootDir = this.$store.state.context?.globalConfig?.rootDir
-      return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : '< No Project >'
-    },
     projectErrors() {
       return this.$store.state.execution?.result.numFailedTests
     },
@@ -71,5 +79,9 @@ export default {
 }
 .reporters-header > div {
   padding-right: 1rem;
+}
+
+.reporters-header .selected-reporter-title {
+  font-weight: bolder;
 }
 </style>
