@@ -2,7 +2,6 @@
 <template>
   <CommunicationLink
       @on-message="onEvent"
-      @on-instance-connected="onConnected"
       @on-disconnected="onDisconnected"
       @on-accept-reporters="onAcceptReporters"
       @on-identify-reporter="onIdentifyReporter"
@@ -54,9 +53,6 @@ export default {
     // connection events
     onEvent(event) {
       this.$store.commit('onEvent', event)
-    },
-    onConnected(context) {
-      this.$store.commit('onConnected', context)
     },
     onDisconnected() {
       this.$store.commit('onDisconnected')

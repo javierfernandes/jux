@@ -5,16 +5,13 @@
 // import Protocol from '@/api/Protocol'
 import { provide, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-
-const JUX_SERVICE_PORT = 5326
-const JUX_PROTOCOL = 'JUX_CLIENT'
+import JuxServiceConnection from '../api/JuxServiceConnection'
 
   export default {
     name: 'CommunicationLink',
     emits: [
       'onAcceptReporters',
       'onMessage',
-      'onConnected',
       'onDisconnected',
       'onReporterAdded',
       'onIdentifyReporter',
@@ -22,7 +19,7 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
 
     setup() {
 
-      const client = ref()
+      const connectionRef = ref()
 
       // id - { resolve, reject }
       // keeps track of outgoing requests with a generated id so that it handles incoming responses
@@ -30,7 +27,7 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
       const pendingMessages = {}
       const request = message => {
         const id = uuidv4()
-        client.value.send(JSON.stringify({ ...message, id }))
+        connectionRef.value.send({ ...message, id })
         return new Promise(resolve => {
           pendingMessages[id] = resolve
         })
@@ -39,14 +36,8 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
       provide('request', request)
 
       return {
-        onConnected(instance) {
-          client.value = instance.ws
-          // get the context info on connected
-          request({
-            type: 'getContext'
-          }).then(context => {
-            instance.$emit('onInstanceConnected', context)
-          })
+        onConnected(connection) {
+          connectionRef.value = connection
         },
         onResponse(data) {
           const { id, value } = data
@@ -65,61 +56,25 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
         }
       }
 
-      console.log('>>>> Connecting to JUX Service ...')
-      const self = this
-      const connect = () => {
-        self.ws = new WebSocket(`ws://localhost:${JUX_SERVICE_PORT}/`, [JUX_PROTOCOL])
+      this.connection = new JuxServiceConnection()
+      // call the setup function so that it binds the client to be used in the request()
+      // that is provided to lower components
+      this.connection.onConnected(() => this.onConnected(this.connection))
+      this.connection.onDisconnected(() => this.$emit('onDisconnected'))
 
-        self.ws.onopen = () => {
-          console.log('Connected !')
-          self.onConnected(self)
-        }
-        self.ws.onclose = () => {
-          console.log('Closed ! retrying in 5000')
-          setTimeout(connect, 5000)
-        }
-        self.ws.onmessage = event => {
+      this.connection.onReporterMessage(handleReporterMessage)
+      this.connection.onAcceptReporters(reporters =>
+        this.$emit('onAcceptReporters', reporters)
+      )
+      this.connection.onReporterAdded(reporter =>
+        this.$emit('onReporterAdded', reporter)
+      )
 
-          const data = JSON.parse(event.data)
-          console.log('>> INCOMING', data)
-          // service Level package
-          switch(data.type) {
-            case 'reporterMessage': {
-              console.log('>> REPORTER EVENT from', data.reporter, 'with data', data.data)
-              handleReporterMessage(data.reporter, data.data)
-              break
-            }
-            case 'acceptReporters': {
-              self.$emit('onAcceptReporters', data.reporters)
-              break
-            }
-            case 'reporterAdded': {
-              self.$emit('onReporterAdded', data.reporter)
-              break
-            }
-            default: console.log('>> UNKNOWN MESSAGE', data)
-          }
-
-
-          // if (data.type === Protocol.Type.RESPONSE) {
-          //   this.onResponse(data)
-          // } else {
-          //   self.$emit('onMessage', {
-          //     timestamp: event.timeStamp,
-          //     ...data
-          //   })
-          // }
-        }
-        self.ws.onerror = error => {
-          console.log('ERROR:', error)
-          self.$emit('onDisconnected')
-        }
-      }
-      connect()
+      this.connection.connect()
     },
     unmounted() {
       console.log('closing WS')
-      this.ws.close()
+      this.connection.close()
     }
   }
 </script>
