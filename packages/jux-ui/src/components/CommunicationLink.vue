@@ -2,13 +2,23 @@
   <slot></slot>
 </template>
 <script>
-import Protocol from '@/api/Protocol'
+// import Protocol from '@/api/Protocol'
 import { provide, ref } from 'vue'
-  import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
+
+const JUX_SERVICE_PORT = 5326
+const JUX_PROTOCOL = 'JUX_CLIENT'
 
   export default {
     name: 'CommunicationLink',
-    emits: ['onMessage', 'onConnected', 'onDisconnected'],
+    emits: [
+      'onAcceptReporters',
+      'onMessage',
+      'onConnected',
+      'onDisconnected',
+      'onReporterAdded',
+      'onIdentifyReporter',
+    ],
 
     setup() {
 
@@ -47,10 +57,18 @@ import { provide, ref } from 'vue'
       }
     },
     mounted() {
-      console.log('>>>> Connecting WS')
+      // reporter Level package
+      const handleReporterMessage = (reporterId, msg) => {
+        switch(msg.type) {
+          case 'identifyReporter': this.$emit('onIdentifyReporter', { reporterId, context: msg.context }); break
+          default: console.log('UNKNOWN MESSAGE FROM REPORTER', reporterId, msg)
+        }
+      }
+
+      console.log('>>>> Connecting to JUX Service ...')
       const self = this
       const connect = () => {
-        self.ws = new WebSocket('ws://localhost:8888/');
+        self.ws = new WebSocket(`ws://localhost:${JUX_SERVICE_PORT}/`, [JUX_PROTOCOL])
 
         self.ws.onopen = () => {
           console.log('Connected !')
@@ -61,15 +79,36 @@ import { provide, ref } from 'vue'
           setTimeout(connect, 5000)
         }
         self.ws.onmessage = event => {
+
           const data = JSON.parse(event.data)
-          if (data.type === Protocol.Type.RESPONSE) {
-            this.onResponse(data)
-          } else {
-            self.$emit('onMessage', {
-              timestamp: event.timeStamp,
-              ...data
-            })
+          console.log('>> INCOMING', data)
+          // service Level package
+          switch(data.type) {
+            case 'reporterMessage': {
+              console.log('>> REPORTER EVENT from', data.reporter, 'with data', data.data)
+              handleReporterMessage(data.reporter, data.data)
+              break
+            }
+            case 'acceptReporters': {
+              self.$emit('onAcceptReporters', data.reporters)
+              break
+            }
+            case 'reporterAdded': {
+              self.$emit('onReporterAdded', data.reporter)
+              break
+            }
+            default: console.log('>> UNKNOWN MESSAGE', data)
           }
+
+
+          // if (data.type === Protocol.Type.RESPONSE) {
+          //   this.onResponse(data)
+          // } else {
+          //   self.$emit('onMessage', {
+          //     timestamp: event.timeStamp,
+          //     ...data
+          //   })
+          // }
         }
         self.ws.onerror = error => {
           console.log('ERROR:', error)

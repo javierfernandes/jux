@@ -1,4 +1,5 @@
 // import { omit } from 'ramda'
+import { assoc } from 'ramda'
 import { createStore } from 'vuex'
 
 const EventType = {
@@ -11,15 +12,29 @@ const EventType = {
 const store = createStore({
   state: {
     connectionState: 'disconnected',
-    context: null,
-    events: [],
-    execution: null,
-    status: 'idle',
 
+    // { id: String -> Reporter }
+    reporters: {
+      /*
+       * Reporter {
+       *   id: String
+       *   context: { options, globalConfig } // Jest pure data
+       *   status: 'idle',
+       *   events: [],
+       *   execution: null,
+       *
+       *   context: null,
+       * }
+       */
+    },
+
+    // the currently selected test from the left (maybe this must be a component state and not here in the store)
+    // it is UI
     test: null,
   },
   mutations: {
     onEvent(state, event) {
+      console.log('[Store] onEvent', event)
       state.events = [...state.events, event]
 
       switch(event.type) {
@@ -72,7 +87,19 @@ const store = createStore({
     onDisconnected(state) {
       state.connectionState = 'disconnected'
     },
-
+    onAcceptReporters(state, reporters) {
+      // TODO: make a factory fn / constructor to setup Reporter fields
+      state.reporters = reporters.reduce((acc, reporter) => assoc(reporter.id, reporter, acc), {})
+    },
+    onReporterAdded(state, reporterId) {
+      // TODO: make a factory fn / constructor to setup Reporter fields
+      state.reporters[reporterId] = {
+        id: reporterId
+      }
+    },
+    onIdentifyReporter(state, { reporterId, context }) {
+      state.reporters[reporterId].context = context
+    },
     // ui state
     onTestSelected(state, test) {
       state.test = test

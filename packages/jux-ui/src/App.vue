@@ -4,6 +4,9 @@
       @on-message="onEvent"
       @on-instance-connected="onConnected"
       @on-disconnected="onDisconnected"
+      @on-accept-reporters="onAcceptReporters"
+      @on-identify-reporter="onIdentifyReporter"
+      @on-reporter-added="onReporterAdded"
   >
     <div class="layout">
       <!--  nav bar  -->
@@ -57,6 +60,15 @@ export default {
     },
     onDisconnected() {
       this.$store.commit('onDisconnected')
+    },
+    onAcceptReporters(reporters) {
+      this.$store.commit('onAcceptReporters', reporters)
+    },
+    onIdentifyReporter(data) {
+      this.$store.commit('onIdentifyReporter', data)
+    },
+    onReporterAdded(reporter) {
+      this.$store.commit('onReporterAdded', reporter)
     },
     // ui
     onTestSelected(test) {

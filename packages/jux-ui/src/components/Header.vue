@@ -1,12 +1,15 @@
 <template>
   <h2>JUX</h2>
-  <div>
-    {{projectName}}
-    <Badge
-        :value="projectErrors"
-        v-if="projectErrors && projectErrors > 0"
-        severity="danger"
-    />
+  <div class="reporters-header">
+    <div v-for="reporter in reporters" :key="reporter.id">
+      <reporter-tab :reporter="reporter" />
+      <!--   TODO: fix badge, move to ReporterTab -->
+      <Badge
+          :value="projectErrors"
+          v-if="projectErrors && projectErrors > 0"
+          severity="danger"
+      />
+    </div>
   </div>
   <div class="debug">
     <Button label="debug" class="p-button-link" @click="debugVisible = true" />
@@ -19,6 +22,7 @@
 </template>
 <script>
 import Events from '@/components/Events'
+import ReporterTab from '@/components/ReporterTab'
 import Button from 'primevue/button'
 import Sidebar from 'primevue/sidebar'
 import Badge from 'primevue/badge'
@@ -26,6 +30,7 @@ import Badge from 'primevue/badge'
 export default {
   name: 'Header',
   components: {
+    ReporterTab,
     Events,
     Button,
     Sidebar,
@@ -43,6 +48,9 @@ export default {
     },
     projectErrors() {
       return this.$store.state.execution?.result.numFailedTests
+    },
+    reporters() {
+      return Object.values(this.$store.state.reporters)
     }
   }
 }
@@ -55,5 +63,13 @@ export default {
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
+}
+.reporters-header {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+}
+.reporters-header > div {
+  padding-right: 1rem;
 }
 </style>

@@ -8,7 +8,7 @@ const openSocket = () => {
   ws.on('open', () => {})
   ws.on('message', msg => {
     const message = JSON.parse(msg)
-    if (message.type === 'REPORTER_MESSAGE') {
+    if (message.type === 'reporterMessage') {
       console.log('>> REPORTER EVENT from', message.reporter, 'with data', message.data)
     } else {
       console.log('>> UNKNOWN MESSAGE', msg)

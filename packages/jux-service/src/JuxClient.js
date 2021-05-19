@@ -19,16 +19,38 @@ class JuxClient {
   }
 
   send(msg) {
-    this.ws.send(msg)
+    this.ws.send(JSON.stringify(msg))
   }
 
   sendReporters() {
-    this.send(JSON.stringify({
+    this.send({
       type: 'acceptReporters',
-      reporters: this.service.getReporters().map(r => r.id)
-    }))
+      reporters: this.service.getReporters().map(r => ({
+        id: r.id,
+        context: r.context
+      }))
+    })
   }
 
+  // API
+
+  reporterAdded(reporter) {
+    this.send({
+      type: 'reporterAdded',
+      reporter: reporter.id
+    })
+  }
+  // TODO: reporterRemoved
+
+  reporterMessage(data, reporter) {
+    const msg = {
+      type: 'reporterMessage',
+      reporter: reporter.id,
+      data,
+    }
+    console.log('BROADCASTING reporter message', msg)
+    this.send(msg)
+  }
 }
 
 module.exports = JuxClient

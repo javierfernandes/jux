@@ -15,17 +15,17 @@ class JuxService {
     this.clients.push(new JuxClient(uuid(), ws, this))
   }
   addReporter(ws) {
-    this.reporters.push(new JuxReporter(uuid(), ws, this))
+    const reporter = new JuxReporter(uuid(), ws, this)
+    this.reporters.push(reporter)
+    this.clients.forEach(c => c.reporterAdded(reporter))
   }
 
   getReporters() { return this.reporters }
 
-  sendToClients(data, reporter) {
-    this.clients.forEach(c => c.send(JSON.stringify({
-      type: 'REPORTER_MESSAGE',
-      reporter: reporter.id,
-      data: data
-    })))
+  /** to be used by reporters */
+
+  withClients(fn) {
+    this.clients.forEach(c => fn(c))
   }
 
 }

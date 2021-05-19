@@ -16,9 +16,7 @@ const openSocket = () => {
     port: PORT,
   })
   wss.on('connection', ws => {
-
     console.log('<<< Incoming connection !', ws.protocol)
-
     switch(ws.protocol) {
       case Protocols.CLIENT: service.addClient(ws); break
       case Protocols.REPORTER: service.addReporter(ws); break
@@ -26,7 +24,15 @@ const openSocket = () => {
         console.error('Got connection from unknown protocol', ws.protocol)
       }
     }
-
+    ws.on('disconnect', () => {
+      // TODO: this doesn't seems to work
+      // we must remove the reporter / client from our registry
+      // for reporters we must broadcast a message so that clients remove them
+      console.log('>>> Disconnected', ws.protocol)
+    })
+  })
+  wss.on('disconnect', ws => {
+    console.log('## Disconnected', ws.protocol)
   })
 }
 
