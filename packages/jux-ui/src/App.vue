@@ -4,8 +4,9 @@
       @on-message="onEvent"
       @on-disconnected="onDisconnected"
       @on-accept-reporters="onAcceptReporters"
-      @on-identify-reporter="onIdentifyReporter"
       @on-reporter-added="onReporterAdded"
+
+      @on-reporter-message="onReporterMessage"
   >
     <div class="layout">
       <!--  nav bar  -->
@@ -65,6 +66,9 @@ export default {
     },
     onReporterAdded(reporter) {
       this.$store.commit('onReporterAdded', reporter)
+    },
+    onReporterMessage(payload) {
+      this.$store.commit('onReporterMessage', payload)
     },
     // ui
     onTestSelected(test) {

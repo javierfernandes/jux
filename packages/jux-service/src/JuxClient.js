@@ -1,4 +1,21 @@
 
+const ClientTypes = {
+  /**
+   * Pushes a list of reporters to the client
+   */
+  ACCEPT_REPORTERS: 'acceptReporters',
+
+  /**
+   * Notify that a new reporter has been registered
+   */
+  REPORTER_ADDED: 'reporterAdded',
+
+  /**
+   * Forwards a message from a reporter to a client
+   */
+  REPORTER_MESSAGE: 'reporterMessage',
+}
+
 /**
  *
  */
@@ -24,7 +41,7 @@ class JuxClient {
 
   sendReporters() {
     this.send({
-      type: 'acceptReporters',
+      type: ClientTypes.ACCEPT_REPORTERS,
       reporters: this.service.getReporters().map(r => ({
         id: r.id,
         context: r.context
@@ -36,17 +53,17 @@ class JuxClient {
 
   reporterAdded(reporter) {
     this.send({
-      type: 'reporterAdded',
+      type: ClientTypes.REPORTER_ADDED,
       reporter: reporter.id
     })
   }
   // TODO: reporterRemoved
 
-  reporterMessage(data, reporter) {
+  reporterMessage(message, reporter) {
     const msg = {
-      type: 'reporterMessage',
+      type: ClientTypes.REPORTER_MESSAGE,
       reporter: reporter.id,
-      data,
+      message,
     }
     console.log('BROADCASTING reporter message', msg)
     this.send(msg)

@@ -33,6 +33,7 @@ const store = createStore({
     test: null,
   },
   mutations: {
+
     onEvent(state, event) {
       console.log('[Store] onEvent', event)
       state.events = [...state.events, event]
@@ -59,7 +60,6 @@ const store = createStore({
             {
               state: 'running',
               ...event.test
-              // ...omit(['context'], event.test)
             }
           ]
           break
@@ -77,13 +77,11 @@ const store = createStore({
         }
       }
     },
-    clearEvents(state) {
-      state.events = []
-    },
-    onConnected(state, context) {
-      state.connectionState = 'connected'
-      state.context = context
-    },
+
+    //
+    // service level events
+    //
+
     onDisconnected(state) {
       state.connectionState = 'disconnected'
     },
@@ -97,14 +95,51 @@ const store = createStore({
         id: reporterId
       }
     },
-    onIdentifyReporter(state, { reporterId, context }) {
-      state.reporters[reporterId].context = context
+
+    //
+    // individual reporter messages
+    //
+    onReporterMessage(state, { reporterId, message }) {
+      const { type, ...payload } = message
+      const handler = ReporterMessageHandlers[type]
+      if (handler) {
+        handler(state, reporterId, payload)
+      } else {
+        console.log('UNKNOWN MESSAGE FROM REPORTER', reporterId, message)
+      }
     },
+
+
+    clearEvents(state) {
+      state.events = []
+    },
+
     // ui state
     onTestSelected(state, test) {
       state.test = test
-    }
+    },
+
   }
 })
+
+/**
+ * Here each member must match the "type" of message sent by reporters
+ * A reporter message has this form
+ * {
+ *   type: 'reporterMessage'
+ *   reporter: String // reporterId
+ *   data: {
+ *     type: 'identifyReporter',    // THIS MUST BE THE NAME OF THE METHOD
+ *     ... payload                  // REST is forwarded as second param
+ *   }
+ * }
+ */
+const ReporterMessageHandlers = {
+
+  identifyReporter(state, reporterId, { context }) {
+    state.reporters[reporterId].context = context
+  }
+
+}
 
 export default store

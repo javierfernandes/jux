@@ -48,21 +48,15 @@ import JuxServiceConnection from '../api/JuxServiceConnection'
       }
     },
     mounted() {
-      // reporter Level package
-      const handleReporterMessage = (reporterId, msg) => {
-        switch(msg.type) {
-          case 'identifyReporter': this.$emit('onIdentifyReporter', { reporterId, context: msg.context }); break
-          default: console.log('UNKNOWN MESSAGE FROM REPORTER', reporterId, msg)
-        }
-      }
-
       this.connection = new JuxServiceConnection()
       // call the setup function so that it binds the client to be used in the request()
       // that is provided to lower components
       this.connection.onConnected(() => this.onConnected(this.connection))
       this.connection.onDisconnected(() => this.$emit('onDisconnected'))
 
-      this.connection.onReporterMessage(handleReporterMessage)
+      this.connection.onReporterMessage((reporterId, message) => {
+        this.$emit('onReporterMessage', { reporterId, message })
+      })
       this.connection.onAcceptReporters(reporters =>
         this.$emit('onAcceptReporters', reporters)
       )
