@@ -46,22 +46,26 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
  * And it allows to send messages through @send()
  *
  */
+// TODO: give built-in support for request/response encapsulated here instace of in CommunicationLink
 class JuxServiceConnection {
 
-  onDisconnected(onDisconnected) {
-    this.onDisconnectedFn = onDisconnected
+  onConnected(onConnectedFn) {
+    this.onConnectedFn = onConnectedFn
   }
-  onConnected(onConnected) {
-    this.onConnectedFn = onConnected
+  onDisconnected(onDisconnectedFn) {
+    this.onDisconnectedFn = onDisconnectedFn
   }
-  onReporterMessage(onReporterMessage) {
-    this.onReporterMessageFn = onReporterMessage
+  onReporterMessage(onReporterMessageFn) {
+    this.onReporterMessageFn = onReporterMessageFn
   }
-  onAcceptReporters(onAcceptReporters) {
-    this.onAcceptReportersFn = onAcceptReporters
+  onAcceptReporters(onAcceptReportersFn) {
+    this.onAcceptReportersFn = onAcceptReportersFn
   }
-  onReporterAdded(onReporterAdded) {
-    this.onReporterAddedFn = onReporterAdded
+  onReporterAdded(onReporterAddedFn) {
+    this.onReporterAddedFn = onReporterAddedFn
+  }
+  onReporterResponse(onReporterResponseFn) {
+    this.onReporterResponseFn = onReporterResponseFn
   }
 
   connect() {
@@ -80,13 +84,19 @@ class JuxServiceConnection {
     }
 
     this.ws.onmessage = event => {
+      // event.timeStamp: store this tstamp
+
       const data = JSON.parse(event.data)
-      console.log('>> INCOMING', data)
+      // console.log('>> INCOMING', data)
 
       // service Level package
       switch(data.type) {
         case 'reporterMessage': {
-          this.onReporterMessageFn?.(data.reporter, data.message)
+          if (data.message.type === 'response') {
+            this.onReporterResponseFn?.(data.message)
+          } else {
+            this.onReporterMessageFn?.(data.reporter, data.message)
+          }
           break
         }
         case 'acceptReporters': {
@@ -97,17 +107,12 @@ class JuxServiceConnection {
           this.onReporterAddedFn?.(data.reporter)
           break
         }
+        case 'response': {
+          this.onResponseFn?.(data)
+          break
+        }
         default: console.log('>> UNKNOWN MESSAGE', data)
       }
-
-      // if (data.type === Protocol.Type.RESPONSE) {
-      //   this.onResponse(data)
-      // } else {
-      //   self.$emit('onMessage', {
-      //     timestamp: event.timeStamp,
-      //     ...data
-      //   })
-      // }
     }
     this.ws.onerror = error => {
       console.log('ERROR:', error)

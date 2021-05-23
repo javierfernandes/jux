@@ -4,7 +4,7 @@
       :class="`p-button-link ${isCurrent && 'selected-reporter-title'}`"
       @click="onSelected"
   />
-  <!--   TODO: fix badge, move to ReporterTab -->
+  <!--   TODO: fix badge-->
   <Badge
       :value="projectErrors"
       v-if="projectErrors && projectErrors > 0"
@@ -25,15 +25,12 @@ export default {
   },
   methods: {
     onSelected() {
-      console.log('ReporterTab on selected !!')
       this.$emit('onSelected', this.reporter)
     }
   },
   computed: {
     title() {
       const rootDir = this.reporter?.context?.globalConfig?.rootDir
-      console.log('rootDir', rootDir)
-      console.log('reporter', this.reporter)
       return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : this.reporter.id.slice(0, 5)
     },
     projectErrors() {

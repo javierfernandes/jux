@@ -3280,52 +3280,21 @@ const RequestHandler = __webpack_require__(398)
 const JUX_SERVICE_PORT = 5326
 const JUX_PROTOCOL = 'JUX_REPORTER'
 
-let server
+const ReporterTypes = {
 
-const createServerIfNeeded = context => {
-  if (server) return
+  toReporter: {
 
-  console.log('Firing up JUX server')
-  const wss = new WebSocket.Server({
-    // TODO: take this from config !
-    port: 8888,
-  })
-  wss.on('connection', ws => {
-    console.log('<<< Connected to browser/client !')
+  },
 
-    const reply = (id, value) => {
-      ws.send(JSON.stringify({
-        type: Protocol.Type.RESPONSE, id, value
-      }))
-    }
+  fromReporter: {
 
-    ws.on('message', async messageString => {
-      const message = JSON.parse(messageString)
-      const { type, id } = message
-      const handler = RequestHandler[type]
-      if (handler) {
-        try {
-          const value = await handler(message, context)
-          reply(id, value)
-        } catch(err) {
+    IDENTIFY_REPORTER: 'identifyReporter'
 
-        }
-      }
-    })
-
-  })
-
-  server = {
-    send: msg => {
-      console.log('sending message to', wss.clients.size, 'clients')
-      wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(msg))
-        }
-      })
-    }
   }
+
 }
+
+let server
 
 const connectToServiceIfNeeded = context => {
   if (server) return
@@ -3344,7 +3313,7 @@ const connectToServiceIfNeeded = context => {
 
     // send our initial info
     server.send({
-      type: 'identifyReporter',
+      type: ReporterTypes.fromReporter.IDENTIFY_REPORTER,
       context
     })
   })
@@ -3360,6 +3329,7 @@ const connectToServiceIfNeeded = context => {
   ws.on('message', async messageString => {
     const message = JSON.parse(messageString)
     const { type, id } = message
+    // console.log('RECEIVED', messageString)
     const handler = RequestHandler[type]
     if (handler) {
       try {
@@ -3368,6 +3338,8 @@ const connectToServiceIfNeeded = context => {
       } catch(err) {
         // TODO: handle here
       }
+    } else {
+      console.error(`No handler for message type ${type}`, message)
     }
   })
 

@@ -1,19 +1,34 @@
 
 const ClientTypes = {
-  /**
-   * Pushes a list of reporters to the client
-   */
-  ACCEPT_REPORTERS: 'acceptReporters',
 
-  /**
-   * Notify that a new reporter has been registered
-   */
-  REPORTER_ADDED: 'reporterAdded',
+  toClient: {
 
-  /**
-   * Forwards a message from a reporter to a client
-   */
-  REPORTER_MESSAGE: 'reporterMessage',
+    /**
+     * Pushes a list of reporters to the client
+     */
+    ACCEPT_REPORTERS: 'acceptReporters',
+
+    /**
+     * Notify that a new reporter has been registered
+     */
+    REPORTER_ADDED: 'reporterAdded',
+
+    /**
+     * Forwards a message from a reporter to a client
+     */
+    REPORTER_MESSAGE: 'reporterMessage',
+
+  },
+
+  fromClient: {
+
+    /**
+     * A client ask to send a message to a given reporter.
+     */
+    MESSAGE_TO_REPORTER: 'messageToReporter',
+
+  }
+
 }
 
 /**
@@ -29,10 +44,18 @@ class JuxClient {
 
     this.sendReporters()
   }
-  async onMessage(messageString){
+  async onMessage(messageString) {
     const message = JSON.parse(messageString)
     const { type } = message
-    // TODO: accept here
+    switch (type) {
+      case ClientTypes.fromClient.MESSAGE_TO_REPORTER: {
+        this.service.sendToReporter(message.reporterId, message.message)
+        break
+      }
+      default: {
+        console.error(`<<< [client-${this.id}] - UNKNOWN MESSAGE:`, message)
+      }
+    }
   }
 
   send(msg) {
@@ -41,7 +64,7 @@ class JuxClient {
 
   sendReporters() {
     this.send({
-      type: ClientTypes.ACCEPT_REPORTERS,
+      type: ClientTypes.toClient.ACCEPT_REPORTERS,
       reporters: this.service.getReporters().map(r => ({
         id: r.id,
         context: r.context
@@ -53,20 +76,18 @@ class JuxClient {
 
   reporterAdded(reporter) {
     this.send({
-      type: ClientTypes.REPORTER_ADDED,
+      type: ClientTypes.toClient.REPORTER_ADDED,
       reporter: reporter.id
     })
   }
   // TODO: reporterRemoved
 
   reporterMessage(message, reporter) {
-    const msg = {
-      type: ClientTypes.REPORTER_MESSAGE,
+    this.send({
+      type: ClientTypes.toClient.REPORTER_MESSAGE,
       reporter: reporter.id,
       message,
-    }
-    console.log('BROADCASTING reporter message', msg)
-    this.send(msg)
+    })
   }
 }
 

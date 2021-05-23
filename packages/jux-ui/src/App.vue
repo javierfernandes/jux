@@ -20,7 +20,7 @@
             <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
           </SplitterPanel>
           <SplitterPanel :size="65" :minSize="50">
-            <test-detail :test="selectedTest" />
+            <test-detail :reporter="currentReporter" :test="selectedTest" />
           </SplitterPanel>
         </Splitter>
       </div>

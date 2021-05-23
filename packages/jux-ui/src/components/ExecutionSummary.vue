@@ -1,6 +1,6 @@
 <template>
   <div class="execution-summary">
-    <div>{{reporter.status}}</div>
+    <div>{{reporter?.status}}</div>
     <div class="counters">
       <div class="counter-box failed">
         {{result.numFailedTests}} failed

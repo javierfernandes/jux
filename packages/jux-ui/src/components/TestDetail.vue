@@ -11,7 +11,7 @@
           <h4>Error</h4>
 
             <div v-for="failure in failureMessages" :key="failure.line">
-              <failure-source-code :failure="failure" />
+              <failure-source-code :reporter="reporter" :failure="failure" />
               <div class="test-failure-messages-box">
                 <div v-for="line in failure.lines" :key="line">
                   <div v-html="line" />
@@ -54,7 +54,7 @@ const converter = new AnsiUp()
 
 export default {
   name: 'TestDetail',
-  props: ['test'],
+  props: ['reporter', 'test'],
   components: {
     FailureSourceCode,
     StackTraceFrame,

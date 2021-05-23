@@ -21,11 +21,18 @@ class JuxService {
   }
 
   getReporters() { return this.reporters }
+  getReporter(id) {
+    return this.reporters.find(r => r.id === id)
+  }
 
   /** to be used by reporters */
 
   withClients(fn) {
     this.clients.forEach(c => fn(c))
+  }
+
+  sendToReporter(reporterId, message) {
+    this.getReporter(reporterId).send(message)
   }
 
 }

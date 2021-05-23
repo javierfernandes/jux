@@ -2,11 +2,13 @@
 import { assoc } from 'ramda'
 import { createStore } from 'vuex'
 
-const EventType = {
+const TestEventType = {
+
   onRunStart: 'onRunStart',
   onRunComplete: 'onRunComplete',
   onTestFileStart: 'onTestFileStart',
   onTestFileResult: 'onTestFileResult',
+
 }
 
 const store = createStore({
@@ -75,7 +77,7 @@ const store = createStore({
       if (handler) {
         handler(state, reporterId, payload)
       } else {
-        console.log('UNKNOWN MESSAGE FROM REPORTER', reporterId, message)
+        console.error('UNKNOWN MESSAGE FROM REPORTER', reporterId, message)
       }
     },
 
@@ -123,7 +125,7 @@ const ReporterMessageHandlers = {
     state.reporters[reporterId].context = context
   },
 
-  [EventType.onRunStart]: (state, reporterId, { aggregatedResults }) => {
+  [TestEventType.onRunStart]: (state, reporterId, { aggregatedResults }) => {
     state.reporters[reporterId].status = ReporterStatusType.running
     // make a new execution
     state.reporters[reporterId].execution = {
@@ -134,12 +136,12 @@ const ReporterMessageHandlers = {
     }
   },
 
-  [EventType.onRunComplete]: (state, reporterId, { results }) => {
+  [TestEventType.onRunComplete]: (state, reporterId, { results }) => {
     state.reporters[reporterId].status = ReporterStatusType.idle
     state.reporters[reporterId].execution.result = results
   },
 
-  [EventType.onTestFileStart]: (state, reporterId, { test }) => {
+  [TestEventType.onTestFileStart]: (state, reporterId, { test }) => {
     state.reporters[reporterId].execution.files = [
       ...state.reporters[reporterId].execution.files,
       {
@@ -149,7 +151,7 @@ const ReporterMessageHandlers = {
     ]
   },
 
-  [EventType.onTestFileResult]: (state, reporterId, { test: { path }, result }) => {
+  [TestEventType.onTestFileResult]: (state, reporterId, { test: { path }, result }) => {
     state.reporters[reporterId].execution.files = state.reporters[reporterId].execution.files.map(file => file.path === path ?
       {
         ...file,

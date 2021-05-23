@@ -7,6 +7,12 @@ import { provide, ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import JuxServiceConnection from '../api/JuxServiceConnection'
 
+const MessageType = {
+  outgoing: {
+    MESSAGE_TO_REPORTER: 'messageToReporter'
+  }
+}
+
   export default {
     name: 'CommunicationLink',
     emits: [
@@ -25,11 +31,19 @@ import JuxServiceConnection from '../api/JuxServiceConnection'
       // keeps track of outgoing requests with a generated id so that it handles incoming responses
       // and models the whole request-response as a promise
       const pendingMessages = {}
-      const request = message => {
+      const request = (reporterId, message) => {
         const id = uuidv4()
-        connectionRef.value.send({ ...message, id })
-        return new Promise(resolve => {
-          pendingMessages[id] = resolve
+        const req = {
+          type: MessageType.outgoing.MESSAGE_TO_REPORTER,
+          reporterId,
+          message: {
+            ...message, id
+          }
+        }
+        // console.log('>> requesting', req)
+        connectionRef.value.send(req)
+        return new Promise((resolve, reject) => {
+          pendingMessages[id] = { resolve, reject }
         })
       }
 
@@ -39,10 +53,10 @@ import JuxServiceConnection from '../api/JuxServiceConnection'
         onConnected(connection) {
           connectionRef.value = connection
         },
-        onResponse(data) {
-          const { id, value } = data
-          // TODO: support incoming error rejecting here
-          pendingMessages[id](value)
+        onResponse(response) {
+          const { id, value } = response
+          // TODO: support incoming error rejecting here (pendingMessages[id].reject(error))
+          pendingMessages[id].resolve(value)
           delete pendingMessages[id]
         }
       }
@@ -63,6 +77,7 @@ import JuxServiceConnection from '../api/JuxServiceConnection'
       this.connection.onReporterAdded(reporter =>
         this.$emit('onReporterAdded', reporter)
       )
+      this.connection.onReporterResponse(response => this.onResponse(response))
 
       this.connection.connect()
     },
