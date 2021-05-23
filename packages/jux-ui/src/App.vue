@@ -125,7 +125,7 @@ export default {
 
 :root {
   --clickable-hover-color: dodgerblue;
-  --failed-text-color: #ea6060;
+  --failed-primary-color: #D32F2F;
 }
 
 #app {
@@ -235,14 +235,14 @@ body * {
   font-weight: bolder;
 }
 .execution-test-failed {
-  color: var(--failed-text-color);
+  color: var(--failed-primary-color);
 }
 
 .execution-title {
   color: gray;
 }
 .execution-title.execution-title-failed {
-  color: var(--failed-text-color);
+  color: var(--failed-primary-color);
 }
 
 .test-detail .p-breadcrumb {
@@ -289,7 +289,7 @@ body * {
   background: green;
 }
 .status-failed {
-  background: red;
+  background: var(--failed-primary-color);
 }
 .status-skipped {
   background: gray;

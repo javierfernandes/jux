@@ -46,7 +46,7 @@ export default {
   background-color: green;
 }
 .counter-box.failed {
-  background-color: var(--failed-text-color);
+  background-color: var(--failed-primary-color);
 }
 .counter-box.skipped {
   background-color: gray;
