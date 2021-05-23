@@ -1,3 +1,4 @@
+const { pick } = require('ramda')
 const ClientMessageType = require('./ClientMessageType')
 const JuxApp = require('../service/JuxApp')
 
@@ -8,7 +9,7 @@ class JuxClient extends JuxApp {
 
   constructor(id, channel, service) {
     super(id, channel, service)
-    this.sendReporters()
+    this.acceptReporters(this.service.getReporters().map(pick(['id', 'context'])))
   }
 
   async onMessage(message) {
@@ -24,13 +25,10 @@ class JuxClient extends JuxApp {
     }
   }
 
-  sendReporters() {
+  acceptReporters(reporters) {
     this.send({
       type: ClientMessageType.toClient.ACCEPT_REPORTERS,
-      reporters: this.service.getReporters().map(r => ({
-        id: r.id,
-        context: r.context
-      }))
+      reporters
     })
   }
 

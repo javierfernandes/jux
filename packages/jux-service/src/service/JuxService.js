@@ -18,7 +18,11 @@ class JuxService {
   }
 
   addClient(channel) {
-    this.clients.push(new JuxClient(uuid(), channel, this))
+    const client = new JuxClient(uuid(), channel, this)
+    this.clients.push(client)
+    client.onDisconnected(() => {
+      this.clients.reject(propEq('id', client.id))
+    })
   }
   addReporter(channel) {
     const reporter = new JuxReporter(uuid(), channel, this)
@@ -26,8 +30,8 @@ class JuxService {
     this.clients.forEach(c => c.reporterAdded(reporter))
 
     reporter.onDisconnected(() => {
-      // we must remove the reporter / client from our registry
-      // for reporters we must broadcast a message so that clients remove them
+      // TODO: we must broadcast a message so that clients remove it
+      this.reporters.reject(propEq('id', reporter.id))
     })
   }
 
@@ -36,9 +40,7 @@ class JuxService {
 
   /** to be used by reporters */
 
-  withClients(fn) {
-    this.clients.forEach(c => fn(c))
-  }
+  withClients(fn) { this.clients.forEach(fn) }
 
   sendToReporter(reporterId, message) {
     this.getReporter(reporterId).send(message)
