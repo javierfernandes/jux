@@ -1,17 +1,14 @@
 <template>
   <h2>JUX</h2>
   <div class="reporters-header">
+    <div v-if="reporters.length === 0">
+      No Running Instances
+    </div>
     <div v-for="reporter in reporters" :key="reporter.id">
       <reporter-tab
           :reporter="reporter"
           @on-selected="onReporterSelected"
           :is-current="reporter.id === currentReporterId"
-      />
-      <!--   TODO: fix badge, move to ReporterTab -->
-      <Badge
-          :value="projectErrors"
-          v-if="projectErrors && projectErrors > 0"
-          severity="danger"
       />
     </div>
   </div>
@@ -29,7 +26,6 @@ import Events from '@/components/Events'
 import ReporterTab from '@/components/ReporterTab'
 import Button from 'primevue/button'
 import Sidebar from 'primevue/sidebar'
-import Badge from 'primevue/badge'
 
 export default {
   name: 'Header',
@@ -40,7 +36,6 @@ export default {
     Events,
     Button,
     Sidebar,
-    Badge,
   },
   data() {
     return {
@@ -49,7 +44,6 @@ export default {
   },
   methods: {
     onReporterSelected(reporter) {
-      console.log('Header.onReporterSelected', reporter)
       this.$emit('onReporterSelected', reporter)
     }
   },

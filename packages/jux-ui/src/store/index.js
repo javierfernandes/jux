@@ -21,7 +21,12 @@ const store = createStore({
        *   context: { options, globalConfig } // Jest pure data
        *   status: 'idle',
        *   events: [],
-       *   execution: null,
+       *
+       *   execution: {
+       *     result: {
+       *        numFailedTests: number
+       *     }
+       *   },
        *
        *   context: null,
        * }
@@ -34,40 +39,6 @@ const store = createStore({
   },
   mutations: {
 
-    onEvent(state, event) {
-      console.log('[Store] onEvent', event)
-      state.events = [...state.events, event]
-
-      switch(event.type) {
-        case EventType.onRunComplete: {
-          state.status = 'idle'
-          state.execution.result = event.results
-          break
-        }
-        case EventType.onTestFileStart: {
-          state.execution.files = [
-            ...state.execution.files,
-            {
-              state: 'running',
-              ...event.test
-            }
-          ]
-          break
-        }
-        case EventType.onTestFileResult: {
-          const { test: { path }, result } = event
-          state.execution.files = state.execution.files.map(file => file.path === path ?
-              {
-                ...file,
-                state: 'completed',
-                result
-              } : file
-          )
-          break
-        }
-      }
-    },
-
     //
     // service level events
     //
@@ -79,14 +50,14 @@ const store = createStore({
       state.reporters = reporters.reduce((acc, reporter) => assoc(reporter.id, {
         ...reporter,
         events: [],
-        status: 'idle',
+        status: ReporterStatusType.idle,
       }, acc), {})
     },
     onReporterAdded(state, reporterId) {
       state.reporters[reporterId] = {
         id: reporterId,
         events: [],
-        status: 'idle',
+        status: ReporterStatusType.idle,
       }
     },
 
@@ -118,8 +89,21 @@ const store = createStore({
       state.test = test
     },
 
+  },
+
+  getters: {
   }
 })
+
+const ReporterStatusType = {
+  running: 'running',
+  idle: 'idle'
+}
+
+const FileStatusType = {
+  running: 'running',
+  completed: 'completed'
+}
 
 /**
  * Here each member must match the "type" of message sent by reporters
@@ -139,15 +123,41 @@ const ReporterMessageHandlers = {
     state.reporters[reporterId].context = context
   },
 
-  onRunStart(state, reporterId, { aggregatedResults }) {
-    state.reporters[reporterId].status = 'running'
+  [EventType.onRunStart]: (state, reporterId, { aggregatedResults }) => {
+    state.reporters[reporterId].status = ReporterStatusType.running
     // make a new execution
     state.reporters[reporterId].execution = {
       startTime: aggregatedResults.startTime,
       numTotalTestSuites: aggregatedResults.numTotalTestSuites,
-      files: []
+      files: [],
+      result: undefined,
     }
-  }
+  },
+
+  [EventType.onRunComplete]: (state, reporterId, { results }) => {
+    state.reporters[reporterId].status = ReporterStatusType.idle
+    state.reporters[reporterId].execution.result = results
+  },
+
+  [EventType.onTestFileStart]: (state, reporterId, { test }) => {
+    state.reporters[reporterId].execution.files = [
+      ...state.reporters[reporterId].execution.files,
+      {
+        state: FileStatusType.running,
+        ...test
+      }
+    ]
+  },
+
+  [EventType.onTestFileResult]: (state, reporterId, { test: { path }, result }) => {
+    state.reporters[reporterId].execution.files = state.reporters[reporterId].execution.files.map(file => file.path === path ?
+      {
+        ...file,
+        state: FileStatusType.completed,
+        result
+      } : file
+    )
+  },
 
 }
 

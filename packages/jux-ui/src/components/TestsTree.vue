@@ -15,6 +15,7 @@
 
     export default {
       name: 'TestsTree',
+      props: ['reporter'],
       emits: ['onTestSelected'],
       components: {
         ExecutionSummary,
@@ -22,10 +23,10 @@
       },
       computed: {
         execution() {
-          return this.$store.state.execution
+          return this.reporter?.execution
         },
         result() {
-          return this.$store.state.execution?.result
+          return this.execution?.result
         }
       },
       methods: {

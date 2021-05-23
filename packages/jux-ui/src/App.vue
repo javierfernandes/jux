@@ -11,13 +11,13 @@
     <div class="layout">
       <!--  nav bar  -->
       <div class="layout-top-bar">
-        <Header :currentReporterId="currentReporter" @on-reporter-selected="onReporterSelected"/>
+        <Header :currentReporterId="currentReporterId" @on-reporter-selected="onReporterSelected"/>
       </div>
 
       <div class="layout-content">
         <Splitter class="content-splitter">
           <SplitterPanel :size="35" :minSize="20">
-            <tests-tree @on-test-selected="onTestSelected" />
+            <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
           </SplitterPanel>
           <SplitterPanel :size="65" :minSize="50">
             <test-detail :test="selectedTest" />
@@ -57,17 +57,19 @@ export default {
     }
   },
   computed: {
-    currentReporter() {
+    currentReporterId() {
       return this.selectedReporter || head(Object.values(this.$store.state.reporters))?.id
+    },
+    currentReporter() {
+      return this.$store.state.reporters[this.currentReporterId]
     },
     selectedTest() {
       return this.$store.state.test
-    }
+    },
   },
   methods: {
     //
     onReporterSelected(reporter) {
-      console.log('App.onReporterSelected', reporter)
       this.$data.selectedReporter = reporter.id
     },
 
