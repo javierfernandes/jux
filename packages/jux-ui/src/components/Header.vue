@@ -72,6 +72,8 @@ export default {
   padding: 1rem;
 }
 .reporters-header > div {
+  display: flex;
+  align-items: center;
   padding-right: 1rem;
 }
 

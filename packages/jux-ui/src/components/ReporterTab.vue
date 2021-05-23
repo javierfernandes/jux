@@ -6,8 +6,8 @@
   />
   <!--   TODO: fix badge-->
   <Badge
-      :value="projectErrors"
-      v-if="projectErrors && projectErrors > 0"
+      :value="failedCount"
+      v-if="failedCount > 0"
       severity="danger"
   />
 </template>
@@ -33,9 +33,8 @@ export default {
       const rootDir = this.reporter?.context?.globalConfig?.rootDir
       return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : this.reporter.id.slice(0, 5)
     },
-    projectErrors() {
-      // TODO: update this must be for our specific reporter
-      return this.$store.state.execution?.result.numFailedTests
+    failedCount() {
+      return this.reporter.execution?.result?.numFailedTests
     },
   }
 }
