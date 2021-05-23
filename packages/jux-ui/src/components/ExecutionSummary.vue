@@ -1,6 +1,6 @@
 <template>
   <div class="execution-summary">
-    <div>{{status}}</div>
+    <div>{{reporter.status}}</div>
     <div class="counters">
       <div class="counter-box failed">
         {{result.numFailedTests || '-'}} failed
@@ -19,13 +19,10 @@ import pluralize from 'pluralize'
 
 export default {
   name: 'ExecutionSummary',
-  props: ['execution'],
+  props: ['reporter'],
   computed: {
-    status() {
-      return this.$store.state.status
-    },
     result() {
-      return this.execution?.result || {}
+      return this.reporter?.execution?.result || {}
     },
     failedSuitesLabel(){
       return pluralize('suite', this.result.numFailedTestSuites)

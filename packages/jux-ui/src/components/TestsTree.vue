@@ -1,5 +1,5 @@
 <template>
-    <execution-summary :execution="execution" />
+    <execution-summary :reporter="reporter" />
 
     <div v-if="result">
         <ul class="test-files">
