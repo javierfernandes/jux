@@ -3,12 +3,12 @@
     <div>{{reporter.status}}</div>
     <div class="counters">
       <div class="counter-box failed">
-        {{result.numFailedTests || '-'}} failed
-        <div class="counter-box-bottom-line">{{result.numFailedTestSuites || '-'}} {{failedSuitesLabel}}</div>
+        {{result.numFailedTests}} failed
+        <div class="counter-box-bottom-line">{{result.numFailedTestSuites}} {{failedSuitesLabel}}</div>
       </div>
       <div class="counter-box passed">
-        {{result.numPassedTests || '-'}} ok
-        <div class="counter-box-bottom-line">{{result.numPassedTestSuites || '-'}} {{passedSuitesLabel}}</div>
+        {{result.numPassedTests}} ok
+        <div class="counter-box-bottom-line">{{result.numPassedTestSuites}} {{passedSuitesLabel}}</div>
       </div>
       <div class="counter-box skipped">{{result.numPendingTests || '-'}} skipped</div>
     </div>
