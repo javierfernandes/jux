@@ -11,9 +11,15 @@ const TestEventType = {
 
 }
 
+export const ConnectionState = {
+  initial: 'initial',
+  disconnected: 'disconnected',
+  connected: 'connected'
+}
+
 const store = createStore({
   state: {
-    connectionState: 'disconnected',
+    connectionState: ConnectionState.initial,
 
     // { id: String -> Reporter }
     reporters: {
