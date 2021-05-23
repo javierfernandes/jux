@@ -1,5 +1,6 @@
 const JuxClient = require('./JuxClient')
 const ClientMessageType = require('./ClientMessageType')
+const MockChannel = require('../ws/MockChannel')
 
 describe('JuxClient', () => {
 
@@ -36,27 +37,14 @@ describe('JuxClient', () => {
 
     describe('messageToReporter', () => {
 
-      const mockClientChannel = () => {
-        const channel = {
-          onMessage: fn => { channel._onMessage = fn },
-
-          onDisconnected: jest.fn(),
-          send: jest.fn(),
-
-          simulateMessage(msg) {
-            channel._onMessage(msg)
-          }
-        }
-        return channel
-      }
-
       it('should send a message to that reporter', () => {
-        const channel = mockClientChannel()
+        const channel = new MockChannel()
         const service = {
           getReporters: jest.fn(() => []),
           sendToReporter: jest.fn()
         }
-        const client = new JuxClient('ID', channel, service)
+
+        new JuxClient('ID', channel, service)
 
         channel.simulateMessage({
           type: ClientMessageType.fromClient.MESSAGE_TO_REPORTER,

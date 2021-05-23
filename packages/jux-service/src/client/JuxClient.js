@@ -40,12 +40,13 @@ class JuxClient extends JuxApp {
       reporter: reporter.id
     })
   }
+
   // TODO: reporterRemoved
 
-  reporterMessage(message, reporter) {
+  reporterMessage(reporterId, message) {
     this.send({
       type: ClientMessageType.toClient.REPORTER_MESSAGE,
-      reporter: reporter.id,
+      reporter: reporterId,
       message,
     })
   }
