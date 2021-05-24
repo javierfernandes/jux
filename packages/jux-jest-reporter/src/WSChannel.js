@@ -1,5 +1,7 @@
 const WebSocket = require('ws')
 
+const OPEN_READY_STATE = 1
+
 /**
  * Channel impl using websockets to connect to JUX.
  * Useful abstraction to decouple a little bit the main logic
@@ -28,7 +30,9 @@ class WSChannel {
   }
 
   send(msg) {
-    this.ws.send(JSON.stringify(msg))
+    if (this.ws.readyState === OPEN_READY_STATE) {
+      this.ws.send(JSON.stringify(msg))
+    }
   }
 
   onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }

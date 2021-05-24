@@ -43,6 +43,67 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
+/***/ 6:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const ReporterMessageType = __webpack_require__(484)
+const Protocol = __webpack_require__(416)
+const RequestHandler = __webpack_require__(899)
+
+/**
+ * Kind of an SDK class to connect to "jux-service" acting as a reporter.
+ * Provides a simple JS API to abstract from the communication and connection, etc.
+ */
+class JuxReporterConnection {
+
+  constructor(channel, context) {
+    this.channel = channel
+    this.context = context
+
+    this.channel.onConnected(() => {
+      // send our initial info
+      this.send({
+        type: ReporterMessageType.fromReporter.IDENTIFY_REPORTER,
+        context
+      })
+    })
+
+    this.channel.onMessage(async message => {
+      const { type, id } = message
+      // console.log('RECEIVED', messageString)
+      const handler = RequestHandler[type]
+      if (handler) {
+        try {
+          const value = await handler(message, context)
+          this.reply(id, value)
+        } catch(err) {
+          // TODO: handle here
+        }
+      } else {
+        console.error(`No handler for message type ${type}`, message)
+      }
+    })
+  }
+
+  connect() {
+    this.channel.connect()
+  }
+
+  send(msg) {
+    // TODO: if still disconnected then do nothing (?) warning
+    this.channel.send(msg)
+  }
+
+  reply(id, value) {
+    this.channel.send({ type: Protocol.Type.RESPONSE, id, value })
+  }
+
+}
+
+module.exports = JuxReporterConnection
+
+/***/ }),
+
 /***/ 10:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3045,6 +3106,8 @@ try {
 
 const WebSocket = __webpack_require__(237)
 
+const OPEN_READY_STATE = 1
+
 /**
  * Channel impl using websockets to connect to JUX.
  * Useful abstraction to decouple a little bit the main logic
@@ -3073,7 +3136,9 @@ class WSChannel {
   }
 
   send(msg) {
-    this.ws.send(JSON.stringify(msg))
+    if (this.ws.readyState === OPEN_READY_STATE) {
+      this.ws.send(JSON.stringify(msg))
+    }
   }
 
   onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
@@ -3785,53 +3850,14 @@ module.exports = require("fs");
 /***/ 752:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-const RequestHandler = __webpack_require__(899)
-const ReporterMessageType = __webpack_require__(484)
-const Protocol = __webpack_require__(416)
+const JuxReporterConnection = __webpack_require__(6)
 
 /**
  *
  */
 const createJuxReporter = channel => context => {
-
-  const reporter = {
-    send: () => {} // noop while offline
-  }
-
-  channel.onConnected(() => {
-    reporter.send = msg => {
-      channel.send(msg)
-    }
-
-    // send our initial info
-    reporter.send({
-      type: ReporterMessageType.fromReporter.IDENTIFY_REPORTER,
-      context
-    })
-  })
-
-  channel.connect()
-
-  const reply = (id, value) => {
-    channel.send({ type: Protocol.Type.RESPONSE, id, value })
-  }
-
-  channel.onMessage(async message => {
-    const { type, id } = message
-    // console.log('RECEIVED', messageString)
-    const handler = RequestHandler[type]
-    if (handler) {
-      try {
-        const value = await handler(message, context)
-        reply(id, value)
-      } catch(err) {
-        // TODO: handle here
-      }
-    } else {
-      console.error(`No handler for message type ${type}`, message)
-    }
-  })
-
+  const reporter = new JuxReporterConnection(channel, context)
+  reporter.connect()
   return reporter
 }
 
