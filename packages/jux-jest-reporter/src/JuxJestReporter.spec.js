@@ -149,8 +149,31 @@ describe('JuxJestReporter', () => {
 
     describe('incoming requests', () => {
 
-      // TODO:
-      it.skip('should handle "fetchSourceCode" request', () => {})
+      it('should handle "fetchSourceCode" request', async () => {
+        const { reporter, channel } = createReporter()
+
+        channel.simulateConnected()
+
+        channel.simulateMessage({
+          type: ReporterMessageType.toReporter.FETCH_SOURCE_CODE,
+          id: 'REQUEST_ID',
+          file: `${__dirname}/JuxJestReporter.spec.js`
+        })
+
+        // Wait 'cause the handler is async. There could be a better way to do this
+        // but it needs design to ask the reporter for pending ops
+        await new Promise(resolve => {
+          setTimeout(resolve, 1000)
+        })
+
+        // initial identifyReporter + our reply
+        expect(channel.send).toBeCalledTimes(2)
+        expect(channel.send.mock.calls[1]).toMatchObject([{
+          type: ReporterMessageType.fromReporter.RESPONSE,
+          id: 'REQUEST_ID',
+          value: expect.any(String)
+        }])
+      })
 
     })
 

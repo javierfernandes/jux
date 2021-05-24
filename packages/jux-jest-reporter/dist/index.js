@@ -3018,6 +3018,9 @@ const ReporterMessageType = {
     // we never really get this type, the service unwraps it and just sent us the
     // body which also has the type
     // REQUEST: 'request',
+
+    FETCH_SOURCE_CODE: 'fetchSourceCode',
+
   },
 
   fromReporter: {
