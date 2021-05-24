@@ -13,6 +13,8 @@ class JuxApp {
     this.channel.onDisconnected(() => this._handleOnDisconnected())
   }
 
+  getId() { return this.id }
+
   async onMessage(message) {
     throw new Error(`Subclass must implement onMessage() to handle: ${message}`)
   }

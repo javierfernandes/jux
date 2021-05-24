@@ -23,6 +23,7 @@ class JuxService {
     client.onDisconnected(() => {
       this.clients.reject(propEq('id', client.id))
     })
+    return client
   }
   addReporter(channel) {
     const reporter = new JuxReporter(uuid(), channel, this)
@@ -33,9 +34,11 @@ class JuxService {
       // TODO: we must broadcast a message so that clients remove it
       this.reporters.reject(propEq('id', reporter.id))
     })
+    return reporter
   }
 
   getReporters() { return this.reporters }
+  getClients() { return this.clients }
   getReporter(id) { return this.reporters.find(propEq('id', id)) }
 
   /** to be used by reporters */
