@@ -1,13 +1,9 @@
 
 /**
- * A global connection to jux.
- * We keep the same connection between different instantiations of the Jest reporter.
- * I don't like having this global variable here but well...
+ * Class factory for the JustJexReporter.
+ *
  */
-let justReporter
-
-
-module.exports = juxReporterCreator => {
+module.exports = juxReporterProvider => {
 
   /**
    * A jest test runner that accepts incoming WS connections (from the JUX UI)
@@ -16,72 +12,51 @@ module.exports = juxReporterCreator => {
   return class JUXJestReporter {
 
     constructor(globalConfig, options) {
-      this._globalConfig = globalConfig
-      this._options = options
 
-      console.log('Instantiated JUXReporter')
-      if (!justReporter) {
-        justReporter = juxReporterCreator({
-          globalConfig,
-          options
-        })
-      }
-    }
+      this.justReporter = juxReporterProvider({
+        globalConfig,
+        options
+      });
 
-    send(msg) {
-      justReporter.send(msg)
-    }
+      // create delegating methods
+      [
 
-    onRunStart(aggregatedResults, options) {
-      this.send({
-        type: 'onRunStart',
-        aggregatedResults
-      })
-    }
+        ['onRunStart', ['aggregatedResults']],
+        ['onRunComplete', [IGNORE, 'results']],
+        ['onTestStart', ['test']],
+        ['onTestResult', ['test', 'result', 'aggregatedResult']],
+        ['onTestFileStart', ['test']],
+        ['onTestFileResult', ['test', 'result', 'aggregatedResult']],
+        ['onTestCaseResult', ['test', 'result']],
 
-    onRunComplete(contexts, results) {
-      this.send({
-        type: 'onRunComplete',
-        results
-      })
-    }
-
-    onTestStart(test) {
-      this.send({
-        type: 'onTestStart',
-        test
-      })
-    }
-    onTestResult(test, result, aggregatedResult) {
-      this.send({
-        type: 'onTestResult',
-        test,
-        result,
-        aggregatedResult
-      })
-    }
-    onTestFileStart(test) {
-      this.send({
-        type: 'onTestFileStart',
-        test
-      })
-    }
-    onTestFileResult(test, result, aggregatedResult) {
-      this.send({
-        type: 'onTestFileResult',
-        test,
-        result,
-        aggregatedResult
-      })
-    }
-
-    onTestCaseResult(test, result) {
-      this.send({
-        type: 'onTestCaseResult',
-        test,
-        result,
+      ].forEach(([name, paramNames]) => {
+        this[name] = (...args) => {
+          this.justReporter.send({
+            type: name,
+            ...argsToParams(args, paramNames)
+          })
+        }
       })
     }
 
   }
+
 }
+
+//
+// forwarding utils
+//
+
+const IGNORE = '__IGNORE__'
+
+/**
+ * Given a list of argument values and a list of param names creates an object
+ * Naming the args and using the arg values.
+ * Ignores those params having IGNORE name
+ */
+const argsToParams = (args, paramNames) => paramNames.reduce((acc, paramName, i) => {
+  if (paramName !== IGNORE) {
+    acc[paramName] = args[i]
+  }
+  return acc
+}, {})

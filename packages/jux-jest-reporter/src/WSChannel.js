@@ -27,6 +27,10 @@ class WSChannel {
     this.ws.on('message', async messageString => {
       this._onMessageFn(JSON.parse(messageString))
     })
+
+    this.ws.on('error', error => {
+      this._onErrorFn(error)
+    })
   }
 
   send(msg) {
@@ -37,6 +41,7 @@ class WSChannel {
 
   onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
   onMessage(onMessageFn) { this._onMessageFn = onMessageFn }
+  onError(onErrorFn) { this._onErrorFn = onErrorFn }
 
 }
 

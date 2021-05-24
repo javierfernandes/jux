@@ -19,7 +19,13 @@ module.exports =
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete installedModules[moduleId];
+/******/ 		}
 /******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
@@ -1488,15 +1494,22 @@ module.exports = eval("require")("bufferutil");
 
 const JUXJestReporter = __webpack_require__(988)
 const WSChannel = __webpack_require__(590)
-const createJuxReporter = __webpack_require__(752)
+const juxConnectionProvider = __webpack_require__(384)
 
 // config: maybe we should read if from the config when jest instantiates us (?)
 const JUX_SERVICE_PORT = 5326
 const JUX_PROTOCOL = 'JUX_REPORTER'
 
 const channel = new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL)
+channel.onError(error => {
+  console.error(`
+  >>>>
+  >>>> ERROR connecting to JUX Service !
+  >>>>   make sure the service is running
+  `)
+})
 
-module.exports = JUXJestReporter(createJuxReporter(channel))
+module.exports = JUXJestReporter(juxConnectionProvider(channel))
 
 /***/ }),
 
@@ -2941,6 +2954,35 @@ try {
 
 /***/ }),
 
+/***/ 384:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const JuxReporterConnection = __webpack_require__(6)
+
+/**
+ * We instantiate and connect just once.
+ * JuxJestReporter might be instantiated several times but we will keep the
+ * same connection for the whole jest lifecycle
+ * TODO: I need to confirm that it instantiate the reporter > 1 time
+ */
+let connection
+
+/**
+ *
+ */
+const juxConnectionProvider = channel => context => {
+  if (!connection) {
+    connection = new JuxReporterConnection(channel, context)
+    connection.connect()
+    return connection
+  }
+  return connection
+}
+
+module.exports = juxConnectionProvider
+
+/***/ }),
+
 /***/ 413:
 /***/ (function(module) {
 
@@ -3133,6 +3175,10 @@ class WSChannel {
     this.ws.on('message', async messageString => {
       this._onMessageFn(JSON.parse(messageString))
     })
+
+    this.ws.on('error', error => {
+      this._onErrorFn(error)
+    })
   }
 
   send(msg) {
@@ -3143,6 +3189,7 @@ class WSChannel {
 
   onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
   onMessage(onMessageFn) { this._onMessageFn = onMessageFn }
+  onError(onErrorFn) { this._onErrorFn = onErrorFn }
 
 }
 
@@ -3847,24 +3894,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 752:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-const JuxReporterConnection = __webpack_require__(6)
-
-/**
- *
- */
-const createJuxReporter = channel => context => {
-  const reporter = new JuxReporterConnection(channel, context)
-  reporter.connect()
-  return reporter
-}
-
-module.exports = createJuxReporter
-
-/***/ }),
-
 /***/ 761:
 /***/ (function(module) {
 
@@ -4114,14 +4143,10 @@ module.exports = createWebSocketStream;
 
 
 /**
- * A global connection to jux.
- * We keep the same connection between different instantiations of the Jest reporter.
- * I don't like having this global variable here but well...
+ * Class factory for the JustJexReporter.
+ *
  */
-let justReporter
-
-
-module.exports = juxReporterCreator => {
+module.exports = juxReporterProvider => {
 
   /**
    * A jest test runner that accepts incoming WS connections (from the JUX UI)
@@ -4130,75 +4155,54 @@ module.exports = juxReporterCreator => {
   return class JUXJestReporter {
 
     constructor(globalConfig, options) {
-      this._globalConfig = globalConfig
-      this._options = options
 
-      console.log('Instantiated JUXReporter')
-      if (!justReporter) {
-        justReporter = juxReporterCreator({
-          globalConfig,
-          options
-        })
-      }
-    }
+      this.justReporter = juxReporterProvider({
+        globalConfig,
+        options
+      });
 
-    send(msg) {
-      justReporter.send(msg)
-    }
+      // create delegating methods
+      [
 
-    onRunStart(aggregatedResults, options) {
-      this.send({
-        type: 'onRunStart',
-        aggregatedResults
-      })
-    }
+        ['onRunStart', ['aggregatedResults']],
+        ['onRunComplete', [IGNORE, 'results']],
+        ['onTestStart', ['test']],
+        ['onTestResult', ['test', 'result', 'aggregatedResult']],
+        ['onTestFileStart', ['test']],
+        ['onTestFileResult', ['test', 'result', 'aggregatedResult']],
+        ['onTestCaseResult', ['test', 'result']],
 
-    onRunComplete(contexts, results) {
-      this.send({
-        type: 'onRunComplete',
-        results
-      })
-    }
-
-    onTestStart(test) {
-      this.send({
-        type: 'onTestStart',
-        test
-      })
-    }
-    onTestResult(test, result, aggregatedResult) {
-      this.send({
-        type: 'onTestResult',
-        test,
-        result,
-        aggregatedResult
-      })
-    }
-    onTestFileStart(test) {
-      this.send({
-        type: 'onTestFileStart',
-        test
-      })
-    }
-    onTestFileResult(test, result, aggregatedResult) {
-      this.send({
-        type: 'onTestFileResult',
-        test,
-        result,
-        aggregatedResult
-      })
-    }
-
-    onTestCaseResult(test, result) {
-      this.send({
-        type: 'onTestCaseResult',
-        test,
-        result,
+      ].forEach(([name, paramNames]) => {
+        this[name] = (...args) => {
+          this.justReporter.send({
+            type: name,
+            ...argsToParams(args, paramNames)
+          })
+        }
       })
     }
 
   }
+
 }
+
+//
+// forwarding utils
+//
+
+const IGNORE = '__IGNORE__'
+
+/**
+ * Given a list of argument values and a list of param names creates an object
+ * Naming the args and using the arg values.
+ * Ignores those params having IGNORE name
+ */
+const argsToParams = (args, paramNames) => paramNames.reduce((acc, paramName, i) => {
+  if (paramName !== IGNORE) {
+    acc[paramName] = args[i]
+  }
+  return acc
+}, {})
 
 /***/ })
 
