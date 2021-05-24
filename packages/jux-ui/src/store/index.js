@@ -1,6 +1,6 @@
 // import { omit } from 'ramda'
 import { assoc } from 'ramda'
-import { createStore } from 'vuex'
+import { createStore, createLogger } from 'vuex'
 
 const TestEventType = {
 
@@ -18,6 +18,7 @@ export const ConnectionState = {
 }
 
 const store = createStore({
+  plugins: [createLogger()],
   state: {
     connectionState: ConnectionState.initial,
 
@@ -51,8 +52,11 @@ const store = createStore({
     // service level events
     //
 
+    onConnected(state) {
+      state.connectionState = ConnectionState.connected
+    },
     onDisconnected(state) {
-      state.connectionState = 'disconnected'
+      state.connectionState = ConnectionState.disconnected
     },
     onAcceptReporters(state, reporters) {
       state.reporters = reporters.reduce((acc, reporter) => assoc(reporter.id, {
@@ -75,6 +79,7 @@ const store = createStore({
     //
     // individual reporter messages
     //
+
     onReporterMessage(state, { reporterId, message }) {
       const { type, ...payload } = message
 
@@ -106,12 +111,12 @@ const store = createStore({
   }
 })
 
-const ReporterStatusType = {
+export const ReporterStatusType = {
   running: 'running',
   idle: 'idle'
 }
 
-const FileStatusType = {
+export const FileStatusType = {
   running: 'running',
   completed: 'completed'
 }

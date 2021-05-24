@@ -12,6 +12,7 @@
   </Dialog>
   <CommunicationLink
       @on-message="onEvent"
+      @on-connected="onConnected"
       @on-disconnected="onDisconnected"
       @on-accept-reporters="onAcceptReporters"
       @on-reporter-added="onReporterAdded"
@@ -19,24 +20,26 @@
 
       @on-reporter-message="onReporterMessage"
   >
-    <div class="layout">
-      <!--  nav bar  -->
-      <div class="layout-top-bar">
-        <Header :currentReporterId="currentReporterId" @on-reporter-selected="onReporterSelected"/>
-      </div>
+    <BlockUI :blocked="disconnected">
+      <div class="layout">
+        <!--  nav bar  -->
+        <div class="layout-top-bar">
+          <Header :currentReporterId="currentReporterId" @on-reporter-selected="onReporterSelected"/>
+        </div>
 
-      <div class="layout-content">
-        <Splitter class="content-splitter">
-          <SplitterPanel :size="35" :minSize="20">
-            <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
-          </SplitterPanel>
-          <SplitterPanel :size="65" :minSize="50">
-            <test-detail :reporter="currentReporter" :test="selectedTest" />
-          </SplitterPanel>
-        </Splitter>
-      </div>
+        <div class="layout-content">
+          <Splitter class="content-splitter">
+            <SplitterPanel :size="35" :minSize="20">
+              <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
+            </SplitterPanel>
+            <SplitterPanel :size="65" :minSize="50">
+              <test-detail :reporter="currentReporter" :test="selectedTest" />
+            </SplitterPanel>
+          </Splitter>
+        </div>
 
-    </div>
+      </div>
+    </BlockUI>
   </CommunicationLink>
 </template>
 
@@ -44,6 +47,7 @@
 import { ConnectionState } from '@/store'
 import { head } from 'ramda'
 import Splitter from 'primevue/splitter'
+import BlockUI from 'primevue/blockui'
 import SplitterPanel from 'primevue/splitterpanel'
 import Dialog from 'primevue/dialog'
 import ProgressBar from 'primevue/progressbar'
@@ -57,12 +61,13 @@ import TestsTree from './components/TestsTree'
 export default {
   name: 'App',
   components: {
-    Header,
     Splitter,
     SplitterPanel,
     ProgressBar,
     Dialog,
+    BlockUI,
 
+    Header,
     CommunicationLink,
     TestsTree,
     TestDetail,
@@ -95,6 +100,9 @@ export default {
     // connection events
     onEvent(event) {
       this.$store.commit('onEvent', event)
+    },
+    onConnected() {
+      this.$store.commit('onConnected')
     },
     onDisconnected() {
       this.$store.commit('onDisconnected')

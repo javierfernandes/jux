@@ -18,6 +18,7 @@ const MessageType = {
     emits: [
       'onAcceptReporters',
       'onMessage',
+      'onConnected',
       'onDisconnected',
       'onReporterAdded',
       'onReporterRemoved',
@@ -64,9 +65,12 @@ const MessageType = {
     },
     mounted() {
       this.connection = new JuxServiceConnection()
-      // call the setup function so that it binds the client to be used in the request()
-      // that is provided to lower components
-      this.connection.onConnected(() => this.onConnected(this.connection))
+      this.connection.onConnected(() => {
+        // call the setup function so that it binds the client to be used in the request()
+        // that is provided to lower components
+        this.onConnected(this.connection)
+        this.$emit('onConnected')
+      })
       this.connection.onDisconnected(() => this.$emit('onDisconnected'))
 
       this.connection.onReporterMessage((reporterId, message) => {

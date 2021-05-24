@@ -66,6 +66,7 @@ class JuxServiceConnection {
       console.log('Connected !')
       this.onConnectedFn?.()
     }
+
     this.ws.onclose = () => {
       console.log('Closed ! retrying in 5000')
       this.ws = undefined
@@ -114,7 +115,9 @@ class JuxServiceConnection {
   }
 
   close() {
-    this.ws.close()
+    if (this.ws) {
+      this.ws.close()
+    }
   }
 
   send(message) {
