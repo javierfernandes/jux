@@ -1,6 +1,6 @@
 
 /**
- * Specifies the WS message's "type" for cliet related messages
+ * Specifies the WS message's "type" for client related messages
  * This is like an API doc for a JUX client with in/out messages.
  */
 const ClientMessageType = {
@@ -36,6 +36,8 @@ const ClientMessageType = {
      * A client ask to send a message to a given reporter.
      */
     MESSAGE_TO_REPORTER: 'messageToReporter',
+
+    // there are other untyped here that are broadcasted to all clients
 
   }
 

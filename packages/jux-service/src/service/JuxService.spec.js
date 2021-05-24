@@ -1,6 +1,7 @@
 const JuxService = require('./JuxService')
 const MockChannel = require('../ws/MockChannel')
 const ClientMessageType = require('../client/ClientMessageType')
+const ReporterMessageType = require('../reporter/ReporterMessageType')
 
 describe('JuxService', () => {
 
@@ -48,6 +49,43 @@ describe('JuxService', () => {
 
         expect(reporterChannel.send).toBeCalledWith('some message')
         expect(anotherReporterChannel.send).not.toBeCalled()
+      })
+
+    })
+
+    describe('reporter broadcasting messages', () => {
+
+      it('should broadcast an incoming reporter message to all clients', () => {
+        const service = new JuxService()
+
+        // add the reporter
+        const reporterChannel = new MockChannel()
+        const reporter = service.addReporter(reporterChannel)
+
+        // add some clients
+        const clientChannel1 = new MockChannel()
+        service.addClient(clientChannel1)
+
+        const clientChannel2 = new MockChannel()
+        service.addClient(clientChannel2)
+
+        // simulate incoming reporter message
+        const message = {
+          type: 'SOME_REPORTER_MESSAGE_TYPE',
+          payload: { a: 'a', b: 'b' }
+        }
+        reporterChannel.simulateMessage(message)
+
+        // broadcasted to both
+        const expectedCallsArgs = [
+          [{ type: ClientMessageType.toClient.ACCEPT_REPORTERS, reporters: [{ id: reporter.getId(), context: reporter.context }] }],
+          [{ type: ClientMessageType.toClient.REPORTER_MESSAGE, reporter: reporter.getId(), message }]
+        ];
+        [clientChannel1, clientChannel2]
+          .forEach(c => {
+            expect(c.send.mock.calls).toEqual(expectedCallsArgs)
+          })
+
       })
 
     })
