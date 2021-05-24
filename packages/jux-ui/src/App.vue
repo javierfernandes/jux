@@ -1,73 +1,114 @@
 
 <template>
-  <CommunicationLink
-      @on-message="onEvent"
-      @on-instance-connected="onConnected"
-      @on-disconnected="onDisconnected"
-  >
-    <div class="layout">
-      <!--  nav bar  -->
-      <div class="layout-top-bar">
-        <Header />
-      </div>
-
-      <div class="layout-content">
-        <Splitter class="content-splitter">
-          <SplitterPanel :size="35" :minSize="20">
-            <tests-tree @on-test-selected="onTestSelected" />
-          </SplitterPanel>
-          <SplitterPanel :size="65" :minSize="50">
-            <test-detail :test="selectedTest" />
-          </SplitterPanel>
-        </Splitter>
-      </div>
-
+  <Dialog header="Oops !" :visible="disconnected" >
+    <div class="disconnected-dialog">
+      <p>
+      We <strong>lost the connection to the JUX Service</strong> !
+      Make sure it is running as a service !
+      </p>
+      <ProgressBar mode="indeterminate"/>
+      <div class="reconnecting">Reconnecting...</div>
     </div>
+  </Dialog>
+  <CommunicationLink
+      @on-connected="onConnected"
+      @on-disconnected="onDisconnected"
+      @on-accept-reporters="onAcceptReporters"
+      @on-reporter-added="onReporterAdded"
+      @on-reporter-removed="onReporterRemoved"
+
+      @on-reporter-message="onReporterMessage"
+  >
+    <BlockUI :blocked="disconnected">
+      <div class="layout">
+        <!--  nav bar  -->
+        <div class="layout-top-bar">
+          <Header :currentReporterId="currentReporterId" @on-reporter-selected="onReporterSelected"/>
+        </div>
+
+        <div class="layout-content">
+          <Splitter class="content-splitter">
+            <SplitterPanel :size="35" :minSize="20">
+              <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
+            </SplitterPanel>
+            <SplitterPanel :size="65" :minSize="50">
+              <test-detail :reporter="currentReporter" :test="selectedTest" />
+            </SplitterPanel>
+          </Splitter>
+        </div>
+
+      </div>
+    </BlockUI>
   </CommunicationLink>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+import { head } from 'ramda'
 import Splitter from 'primevue/splitter'
+import BlockUI from 'primevue/blockui'
 import SplitterPanel from 'primevue/splitterpanel'
+import Dialog from 'primevue/dialog'
+import ProgressBar from 'primevue/progressbar'
 import 'vue-json-pretty/lib/styles.css'
 
+import { ConnectionState } from '@/store'
 import Header from '@/components/Header'
-import CommunicationLink from './components/CommunicationLink.vue'
-import TestDetail from './components/TestDetail'
-import TestsTree from './components/TestsTree'
+import CommunicationLink from '@/components/CommunicationLink.vue'
+import TestDetail from '@/components/TestDetail'
+import TestsTree from '@/components/TestsTree'
 
 export default {
   name: 'App',
   components: {
-    Header,
     Splitter,
     SplitterPanel,
+    ProgressBar,
+    Dialog,
+    BlockUI,
 
+    Header,
     CommunicationLink,
     TestsTree,
     TestDetail,
   },
-  methods: {
-    // connection events
-    onEvent(event) {
-      this.$store.commit('onEvent', event)
-    },
-    onConnected(context) {
-      this.$store.commit('onConnected', context)
-    },
-    onDisconnected() {
-      this.$store.commit('onDisconnected')
-    },
-    // ui
-    onTestSelected(test) {
-      this.$store.commit('onTestSelected', test)
+  data() {
+    return {
+      selectedReporter: null,
     }
   },
   computed: {
+    currentReporterId() {
+      return this.selectedReporter || head(Object.values(this.$store.state.reporters))?.id
+    },
+    currentReporter() {
+      return this.$store.state.reporters[this.currentReporterId]
+    },
     selectedTest() {
       return this.$store.state.test
+    },
+    disconnected() {
+      return this.$store.state.connectionState === ConnectionState.disconnected
     }
-  }
+  },
+  methods: {
+    //
+    onReporterSelected(reporter) {
+      this.$data.selectedReporter = reporter.id
+    },
+
+    ...mapMutations([
+      'onConnected',
+      'onDisconnected',
+      'onAcceptReporters',
+      'onReporterAdded',
+      'onReporterRemoved',
+      'onReporterMessage',
+      'onAcceptReporters',
+      // ui
+      'onTestSelected'
+    ]),
+  },
 }
 </script>
 
@@ -80,7 +121,7 @@ export default {
 
 :root {
   --clickable-hover-color: dodgerblue;
-  --failed-text-color: #ea6060;
+  --failed-primary-color: #D32F2F;
 }
 
 #app {
@@ -134,6 +175,20 @@ body * {
   width: 100%;
 }
 
+.disconnected-dialog {
+  display: flex;
+  flex-direction: column;
+}
+.disconnected-dialog .p-progressbar {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.disconnected-dialog .reconnecting {
+  align-self: center;
+}
+
+/** content */
+
 .execution-summary {
   display: flex;
   justify-content: space-between;
@@ -178,14 +233,14 @@ body * {
   font-weight: bolder;
 }
 .execution-test-failed {
-  color: var(--failed-text-color);
+  color: var(--failed-primary-color);
 }
 
 .execution-title {
   color: gray;
 }
 .execution-title.execution-title-failed {
-  color: var(--failed-text-color);
+  color: var(--failed-primary-color);
 }
 
 .test-detail .p-breadcrumb {
@@ -232,7 +287,7 @@ body * {
   background: green;
 }
 .status-failed {
-  background: red;
+  background: var(--failed-primary-color);
 }
 .status-skipped {
   background: gray;

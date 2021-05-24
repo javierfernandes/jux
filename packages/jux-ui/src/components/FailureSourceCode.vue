@@ -20,7 +20,7 @@ import 'ace-builds/src-noconflict/theme-chrome'
 
 export default {
   name: 'FailureSourceCode',
-  props: ['failure'],
+  props: ['reporter', 'failure'],
   inject: ['request'],
   components: {
     VAceEditor
@@ -31,10 +31,15 @@ export default {
     })
     onMounted(async () => {
       const instance = getCurrentInstance()
-      const { file } = instance.props.failure.stackTrace[0]
+      const { failure: { stackTrace: [file] }, reporter } = instance.props
       // TODO: use a proxy to make requests !
       // TODO: handle errors
-      state.fileContent = await instance.ctx.request({ type: 'fetchSourceCode', file })
+
+      // console.log('REQUESTING to ', reporter.id, 'message', { type: 'fetchSourceCode', file: file.file })
+      state.fileContent = await instance.ctx.request(
+          reporter.id,
+          { type: 'fetchSourceCode', file: file.file }
+      )
     })
     return {
       state

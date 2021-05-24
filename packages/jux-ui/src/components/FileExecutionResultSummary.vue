@@ -11,7 +11,7 @@ export default {
 </script>
 <style>
 .count-failing {
-  color: red;
+  color: var(--failed-primary-color);
 }
 .count-passed {
   color: green;

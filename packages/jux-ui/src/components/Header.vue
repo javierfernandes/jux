@@ -1,12 +1,16 @@
 <template>
   <h2>JUX</h2>
-  <div>
-    {{projectName}}
-    <Badge
-        :value="projectErrors"
-        v-if="projectErrors && projectErrors > 0"
-        severity="danger"
-    />
+  <div class="reporters-header">
+    <div v-if="reporters.length === 0">
+      No Running Instances
+    </div>
+    <div v-for="reporter in reporters" :key="reporter.id">
+      <reporter-tab
+          :reporter="reporter"
+          @on-selected="onReporterSelected"
+          :is-current="reporter.id === currentReporterId"
+      />
+    </div>
   </div>
   <div class="debug">
     <Button label="debug" class="p-button-link" @click="debugVisible = true" />
@@ -19,30 +23,36 @@
 </template>
 <script>
 import Events from '@/components/Events'
+import ReporterTab from '@/components/ReporterTab'
 import Button from 'primevue/button'
 import Sidebar from 'primevue/sidebar'
-import Badge from 'primevue/badge'
 
 export default {
   name: 'Header',
+  props: ['currentReporterId'],
+  emits: ['onReporterSelected'],
   components: {
+    ReporterTab,
     Events,
     Button,
     Sidebar,
-    Badge,
   },
   data() {
     return {
       debugVisible: false,
     }
   },
+  methods: {
+    onReporterSelected(reporter) {
+      this.$emit('onReporterSelected', reporter)
+    }
+  },
   computed: {
-    projectName() {
-      const rootDir = this.$store.state.context?.globalConfig?.rootDir
-      return rootDir ? rootDir.slice(rootDir.lastIndexOf('/') + 1) : '< No Project >'
-    },
     projectErrors() {
       return this.$store.state.execution?.result.numFailedTests
+    },
+    reporters() {
+      return Object.values(this.$store.state.reporters)
     }
   }
 }
@@ -55,5 +65,19 @@ export default {
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
+}
+.reporters-header {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+}
+.reporters-header > div {
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+}
+
+.reporters-header .selected-reporter-title {
+  font-weight: bolder;
 }
 </style>
