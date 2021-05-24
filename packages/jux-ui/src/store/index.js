@@ -68,6 +68,9 @@ const store = createStore({
         status: ReporterStatusType.idle,
       }
     },
+    onReporterRemoved(state, reporterId) {
+      delete state.reporters[reporterId]
+    },
 
     //
     // individual reporter messages

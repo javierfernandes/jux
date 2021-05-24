@@ -1,5 +1,9 @@
 
-class MockClient {
+/**
+ * A mock impl for `Channel`.
+ * Allows to test all the flow without actually using websockets
+ */
+class MockChannel {
 
   constructor() {
     this.onMessage = jest.fn(this.onMessage)
@@ -9,7 +13,7 @@ class MockClient {
 
   // mock methods
   onMessage(fn) { this._onMessage = fn }
-  onDisconnected() {}
+  onDisconnected(fn) { this._onDisconnect = fn }
   send() {}
 
   //
@@ -18,6 +22,10 @@ class MockClient {
   simulateMessage(msg) {
     this._onMessage(msg)
   }
+
+  simulateDisconnect() {
+    this._onDisconnect()
+  }
 }
 
-module.exports = MockClient
+module.exports = MockChannel

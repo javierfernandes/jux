@@ -49,24 +49,13 @@ const JUX_PROTOCOL = 'JUX_CLIENT'
 // TODO: give built-in support for request/response encapsulated here instace of in CommunicationLink
 class JuxServiceConnection {
 
-  onConnected(onConnectedFn) {
-    this.onConnectedFn = onConnectedFn
-  }
-  onDisconnected(onDisconnectedFn) {
-    this.onDisconnectedFn = onDisconnectedFn
-  }
-  onReporterMessage(onReporterMessageFn) {
-    this.onReporterMessageFn = onReporterMessageFn
-  }
-  onAcceptReporters(onAcceptReportersFn) {
-    this.onAcceptReportersFn = onAcceptReportersFn
-  }
-  onReporterAdded(onReporterAddedFn) {
-    this.onReporterAddedFn = onReporterAddedFn
-  }
-  onReporterResponse(onReporterResponseFn) {
-    this.onReporterResponseFn = onReporterResponseFn
-  }
+  onConnected(onConnectedFn) { this.onConnectedFn = onConnectedFn }
+  onDisconnected(onDisconnectedFn) { this.onDisconnectedFn = onDisconnectedFn }
+  onReporterMessage(onReporterMessageFn) { this.onReporterMessageFn = onReporterMessageFn }
+  onAcceptReporters(onAcceptReportersFn) { this.onAcceptReportersFn = onAcceptReportersFn }
+  onReporterAdded(onReporterAddedFn) { this.onReporterAddedFn = onReporterAddedFn }
+  onReporterRemoved(onReporterRemovedFn) { this.onReporterRemovedFn = onReporterRemovedFn }
+  onReporterResponse(onReporterResponseFn) { this.onReporterResponseFn = onReporterResponseFn }
 
   connect() {
     console.log('>>>> Connecting to JUX Service ...')
@@ -105,6 +94,10 @@ class JuxServiceConnection {
         }
         case 'reporterAdded': {
           this.onReporterAddedFn?.(data.reporter)
+          break
+        }
+        case 'reporterRemoved': {
+          this.onReporterRemovedFn?.(data.reporter)
           break
         }
         case 'response': {

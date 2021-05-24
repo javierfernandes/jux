@@ -21,7 +21,7 @@ class JuxService {
     const client = new JuxClient(uuid(), channel, this)
     this.clients.push(client)
     client.onDisconnected(() => {
-      this.clients.reject(propEq('id', client.id))
+      removeById(this.clients, client.id)
     })
     return client
   }
@@ -31,8 +31,8 @@ class JuxService {
     this.clients.forEach(c => c.reporterAdded(reporter))
 
     reporter.onDisconnected(() => {
-      // TODO: we must broadcast a message so that clients remove it
-      this.reporters.reject(propEq('id', reporter.id))
+      removeById(this.reporters, reporter.id)
+      this.clients.forEach(c => c.reporterRemoved(reporter))
     })
     return reporter
   }
@@ -52,3 +52,9 @@ class JuxService {
 }
 
 module.exports = JuxService
+
+// utils
+
+const removeById = (array, id) => {
+  array.splice(array.findIndex(propEq('id', id)), 1)
+}

@@ -20,9 +20,9 @@ class WSChannel {
   }
 
   onDisconnected(listener) {
-    this.ws.on('disconnect', () => {
+    this.ws.on('close', () => {
       // TODO: this doesn't seems to work
-      console.log('>>> Disconnected', ws.protocol)
+      console.log('>>> Disconnected', this.ws.protocol)
       listener()
     })
   }

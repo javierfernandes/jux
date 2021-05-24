@@ -90,6 +90,50 @@ describe('JuxService', () => {
 
     })
 
+    describe('on reporter disconnected', () => {
+
+      it('should un-register it and broadcast a reportedRemoved message', () => {
+        const service = new JuxService()
+
+        // add the reporter
+        const reporterChannel = new MockChannel()
+        const reporter = service.addReporter(reporterChannel)
+
+        // add a client
+        const clientChannel = new MockChannel()
+        service.addClient(clientChannel)
+
+        // disconnect
+        reporterChannel.simulateDisconnect()
+
+        // removed
+        expect(service.getReporters()).toEqual([])
+        expect(clientChannel.send.mock.calls[1]).toEqual([{
+          type: ClientMessageType.toClient.REPORTER_REMOVED,
+          reporter: reporter.getId()
+        }])
+      })
+
+    })
+
+    describe('on client disconnected', () => {
+
+      it('should un-register it', () => {
+        const service = new JuxService()
+
+        // add a client
+        const clientChannel = new MockChannel()
+        const client = service.addClient(clientChannel)
+
+        // disconnect
+        clientChannel.simulateDisconnect()
+
+        // removed
+        expect(service.getClients()).toEqual([])
+      })
+
+    })
+
   })
 
 })

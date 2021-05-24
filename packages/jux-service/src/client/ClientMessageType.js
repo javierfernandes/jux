@@ -21,6 +21,11 @@ const ClientMessageType = {
     REPORTER_ADDED: 'reporterAdded',
 
     /**
+     * Notify that a reported has disconnected
+     */
+    REPORTER_REMOVED: 'reporterRemoved',
+
+    /**
      * Forwards a message from a reporter to a client
      */
     REPORTER_MESSAGE: 'reporterMessage',

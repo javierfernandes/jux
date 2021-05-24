@@ -20,6 +20,7 @@ const MessageType = {
       'onMessage',
       'onDisconnected',
       'onReporterAdded',
+      'onReporterRemoved',
       'onReporterMessage',
     ],
 
@@ -76,6 +77,9 @@ const MessageType = {
       )
       this.connection.onReporterAdded(reporter =>
         this.$emit('onReporterAdded', reporter)
+      )
+      this.connection.onReporterRemoved(reporter =>
+        this.$emit('onReporterRemoved', reporter)
       )
       this.connection.onReporterResponse(response => this.onResponse(response))
 

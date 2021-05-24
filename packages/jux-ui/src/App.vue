@@ -13,6 +13,7 @@
       @on-disconnected="onDisconnected"
       @on-accept-reporters="onAcceptReporters"
       @on-reporter-added="onReporterAdded"
+      @on-reporter-removed="onReporterRemoved"
 
       @on-reporter-message="onReporterMessage"
   >
@@ -104,6 +105,9 @@ export default {
     },
     onReporterAdded(reporter) {
       this.$store.commit('onReporterAdded', reporter)
+    },
+    onReporterRemoved(reporter) {
+      this.$store.commit('onReporterRemoved', reporter)
     },
     onReporterMessage(payload) {
       this.$store.commit('onReporterMessage', payload)
