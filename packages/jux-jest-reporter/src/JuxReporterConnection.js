@@ -1,5 +1,4 @@
 const ReporterMessageType = require('./ReporterMessageType')
-const Protocol = require('./Protocol')
 const RequestHandler = require('./RequestHandler')
 
 /**
@@ -42,12 +41,18 @@ class JuxReporterConnection {
   }
 
   send(msg) {
-    // TODO: if still disconnected then do nothing (?) warning
+    // TODO: if not yet connected then I think that we should buffer
+    //   and send it all once connected. That will make the UI get
+    //   the initial run
     this.channel.send(msg)
   }
 
   reply(id, value) {
-    this.channel.send({ type: Protocol.Type.RESPONSE, id, value })
+    this.channel.send({
+      type: ReporterMessageType.fromReporter.RESPONSE,
+      id,
+      value
+    })
   }
 
 }

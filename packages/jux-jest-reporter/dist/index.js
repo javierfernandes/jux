@@ -53,7 +53,6 @@ module.exports =
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 const ReporterMessageType = __webpack_require__(484)
-const Protocol = __webpack_require__(416)
 const RequestHandler = __webpack_require__(899)
 
 /**
@@ -96,12 +95,18 @@ class JuxReporterConnection {
   }
 
   send(msg) {
-    // TODO: if still disconnected then do nothing (?) warning
+    // TODO: if not yet connected then I think that we should buffer
+    //   and send it all once connected. That will make the UI get
+    //   the initial run
     this.channel.send(msg)
   }
 
   reply(id, value) {
-    this.channel.send({ type: Protocol.Type.RESPONSE, id, value })
+    this.channel.send({
+      type: ReporterMessageType.fromReporter.RESPONSE,
+      id,
+      value
+    })
   }
 
 }
@@ -2990,21 +2995,6 @@ module.exports = require("stream");
 
 /***/ }),
 
-/***/ 416:
-/***/ (function(module) {
-
-
-const Protocol = {
-  Type: {
-    REQUEST: 'request',
-    RESPONSE: 'response'
-  }
-}
-
-module.exports = Protocol
-
-/***/ }),
-
 /***/ 417:
 /***/ (function(module) {
 
@@ -3015,14 +3005,31 @@ module.exports = require("crypto");
 /***/ 484:
 /***/ (function(module) {
 
-
+/**
+ * API doc for the `type` field om message to/from a reporter
+ */
 const ReporterMessageType = {
 
   toReporter: {
+    /**
+     * Receives a request from a client. Must respond with another message
+     * with type RESPONSE
+     */
+    // we never really get this type, the service unwraps it and just sent us the
+    // body which also has the type
+    // REQUEST: 'request',
   },
 
   fromReporter: {
-    IDENTIFY_REPORTER: 'identifyReporter'
+
+    IDENTIFY_REPORTER: 'identifyReporter',
+
+    /**
+     * Send a response to a received REQUEST message
+     */
+    RESPONSE: 'response',
+
+    ON_RUN_START: 'onRunStart',
   }
 
 }
