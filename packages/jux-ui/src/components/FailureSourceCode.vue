@@ -35,7 +35,7 @@ export default {
       // TODO: use a proxy to make requests !
       // TODO: handle errors
 
-      console.log('REQUESTING to ', reporter.id, 'message', { type: 'fetchSourceCode', file: file.file })
+      // console.log('REQUESTING to ', reporter.id, 'message', { type: 'fetchSourceCode', file: file.file })
       state.fileContent = await instance.ctx.request(
           reporter.id,
           { type: 'fetchSourceCode', file: file.file }

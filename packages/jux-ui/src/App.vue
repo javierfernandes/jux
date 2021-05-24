@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { ConnectionState } from '@/store'
+import { mapMutations } from 'vuex'
 import { head } from 'ramda'
 import Splitter from 'primevue/splitter'
 import BlockUI from 'primevue/blockui'
@@ -53,10 +53,11 @@ import Dialog from 'primevue/dialog'
 import ProgressBar from 'primevue/progressbar'
 import 'vue-json-pretty/lib/styles.css'
 
+import { ConnectionState } from '@/store'
 import Header from '@/components/Header'
-import CommunicationLink from './components/CommunicationLink.vue'
-import TestDetail from './components/TestDetail'
-import TestsTree from './components/TestsTree'
+import CommunicationLink from '@/components/CommunicationLink.vue'
+import TestDetail from '@/components/TestDetail'
+import TestsTree from '@/components/TestsTree'
 
 export default {
   name: 'App',
@@ -101,31 +102,17 @@ export default {
     onEvent(event) {
       this.$store.commit('onEvent', event)
     },
-    onConnected() {
-      this.$store.commit('onConnected')
-    },
-    onDisconnected() {
-      this.$store.commit('onDisconnected')
-    },
-    onAcceptReporters(reporters) {
-      this.$store.commit('onAcceptReporters', reporters)
-    },
-    onIdentifyReporter(data) {
-      this.$store.commit('onIdentifyReporter', data)
-    },
-    onReporterAdded(reporter) {
-      this.$store.commit('onReporterAdded', reporter)
-    },
-    onReporterRemoved(reporter) {
-      this.$store.commit('onReporterRemoved', reporter)
-    },
-    onReporterMessage(payload) {
-      this.$store.commit('onReporterMessage', payload)
-    },
-    // ui
-    onTestSelected(test) {
-      this.$store.commit('onTestSelected', test)
-    }
+    ...mapMutations([
+      'onConnected',
+      'onDisconnected',
+      'onAcceptReporters',
+      'onReporterAdded',
+      'onReporterRemoved',
+      'onReporterMessage',
+      'onAcceptReporters',
+      // ui
+      'onTestSelected'
+    ]),
   },
 }
 </script>

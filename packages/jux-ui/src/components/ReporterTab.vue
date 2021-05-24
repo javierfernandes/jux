@@ -4,7 +4,7 @@
       :class="`p-button-link ${isCurrent && 'selected-reporter-title'}`"
       @click="onSelected"
   />
-  <!--   TODO: fix badge-->
+  <i class="pi pi-spin pi-spinner" v-if="running" />
   <Badge
       :value="failedCount"
       v-if="failedCount > 0"
@@ -12,6 +12,7 @@
   />
 </template>
 <script>
+import { ReporterStatusType } from '@/store'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 
@@ -36,6 +37,9 @@ export default {
     failedCount() {
       return this.reporter.execution?.result?.numFailedTests
     },
+    running() {
+      return this.reporter.status === ReporterStatusType.running
+    }
   }
 }
 </script>

@@ -58,17 +58,13 @@ class JuxServiceConnection {
   onReporterResponse(onReporterResponseFn) { this.onReporterResponseFn = onReporterResponseFn }
 
   connect() {
-    console.log('>>>> Connecting to JUX Service ...')
-
     this.ws = new WebSocket(`ws://localhost:${JUX_SERVICE_PORT}/`, [JUX_PROTOCOL])
 
     this.ws.onopen = () => {
-      console.log('Connected !')
       this.onConnectedFn?.()
     }
 
     this.ws.onclose = () => {
-      console.log('Closed ! retrying in 5000')
       this.ws = undefined
       setTimeout(() => this.connect(), 5000)
     }
@@ -101,15 +97,11 @@ class JuxServiceConnection {
           this.onReporterRemovedFn?.(data.reporter)
           break
         }
-        case 'response': {
-          this.onResponseFn?.(data)
-          break
-        }
         default: console.log('>> UNKNOWN MESSAGE', data)
       }
     }
     this.ws.onerror = error => {
-      console.log('ERROR:', error)
+      console.error('[WS] ERROR:', error)
       this.onDisconnectedFn?.()
     }
   }
