@@ -1,15 +1,8 @@
 // import { omit } from 'ramda'
+import ReporterMessageHandlers from '@/store/ReporterMessageHandlers'
+import ReporterStatusType from '@/store/ReporterStatusType'
 import { assoc } from 'ramda'
 import { createStore, createLogger } from 'vuex'
-
-const TestEventType = {
-
-  onRunStart: 'onRunStart',
-  onRunComplete: 'onRunComplete',
-  onTestFileStart: 'onTestFileStart',
-  onTestFileResult: 'onTestFileResult',
-
-}
 
 export const ConnectionState = {
   initial: 'initial',
@@ -110,71 +103,5 @@ const store = createStore({
   getters: {
   }
 })
-
-export const ReporterStatusType = {
-  running: 'running',
-  idle: 'idle'
-}
-
-export const FileStatusType = {
-  running: 'running',
-  completed: 'completed'
-}
-
-/**
- * Here each member must match the "type" of message sent by reporters
- * A reporter message has this form
- * {
- *   type: 'reporterMessage'
- *   reporter: String // reporterId
- *   data: {
- *     type: 'identifyReporter',    // THIS MUST BE THE NAME OF THE METHOD
- *     ... payload                  // REST is forwarded as second param
- *   }
- * }
- */
-const ReporterMessageHandlers = {
-
-  identifyReporter(state, reporterId, { context }) {
-    state.reporters[reporterId].context = context
-  },
-
-  [TestEventType.onRunStart]: (state, reporterId, { aggregatedResults }) => {
-    state.reporters[reporterId].status = ReporterStatusType.running
-    // make a new execution
-    state.reporters[reporterId].execution = {
-      startTime: aggregatedResults.startTime,
-      numTotalTestSuites: aggregatedResults.numTotalTestSuites,
-      files: [],
-      result: undefined,
-    }
-  },
-
-  [TestEventType.onRunComplete]: (state, reporterId, { results }) => {
-    state.reporters[reporterId].status = ReporterStatusType.idle
-    state.reporters[reporterId].execution.result = results
-  },
-
-  [TestEventType.onTestFileStart]: (state, reporterId, { test }) => {
-    state.reporters[reporterId].execution.files = [
-      ...state.reporters[reporterId].execution.files,
-      {
-        state: FileStatusType.running,
-        ...test
-      }
-    ]
-  },
-
-  [TestEventType.onTestFileResult]: (state, reporterId, { test: { path }, result }) => {
-    state.reporters[reporterId].execution.files = state.reporters[reporterId].execution.files.map(file => file.path === path ?
-      {
-        ...file,
-        state: FileStatusType.completed,
-        result
-      } : file
-    )
-  },
-
-}
 
 export default store

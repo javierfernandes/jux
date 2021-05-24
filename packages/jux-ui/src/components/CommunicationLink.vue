@@ -17,11 +17,11 @@ const MessageType = {
     name: 'CommunicationLink',
     emits: [
       'onAcceptReporters',
-      'onMessage',
       'onConnected',
       'onDisconnected',
       'onReporterAdded',
       'onReporterRemoved',
+
       'onReporterMessage',
     ],
 

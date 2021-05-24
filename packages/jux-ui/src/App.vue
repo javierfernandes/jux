@@ -11,7 +11,6 @@
     </div>
   </Dialog>
   <CommunicationLink
-      @on-message="onEvent"
       @on-connected="onConnected"
       @on-disconnected="onDisconnected"
       @on-accept-reporters="onAcceptReporters"
@@ -98,10 +97,6 @@ export default {
       this.$data.selectedReporter = reporter.id
     },
 
-    // connection events
-    onEvent(event) {
-      this.$store.commit('onEvent', event)
-    },
     ...mapMutations([
       'onConnected',
       'onDisconnected',

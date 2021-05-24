@@ -12,7 +12,7 @@
   />
 </template>
 <script>
-import { ReporterStatusType } from '@/store'
+import ReporterStatusType from '@/store/ReporterStatusType'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
 
