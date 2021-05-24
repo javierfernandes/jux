@@ -2,10 +2,12 @@
 <template>
   <Dialog header="Oops !" :visible="disconnected" >
     <div class="disconnected-dialog">
+      <p>
       We <strong>lost the connection to the JUX Service</strong> !
       Make sure it is running as a service !
-      <ProgressSpinner />
-      <div>Reconnecting...</div>
+      </p>
+      <ProgressBar mode="indeterminate"/>
+      <div class="reconnecting">Reconnecting...</div>
     </div>
   </Dialog>
   <CommunicationLink
@@ -44,7 +46,7 @@ import { head } from 'ramda'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 import Dialog from 'primevue/dialog'
-import ProgressSpinner from 'primevue/progressspinner'
+import ProgressBar from 'primevue/progressbar'
 import 'vue-json-pretty/lib/styles.css'
 
 import Header from '@/components/Header'
@@ -58,7 +60,7 @@ export default {
     Header,
     Splitter,
     SplitterPanel,
-    ProgressSpinner,
+    ProgressBar,
     Dialog,
 
     CommunicationLink,
@@ -186,11 +188,13 @@ body * {
 .disconnected-dialog {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
-.disconnected-dialog .p-progress-spinner {
+.disconnected-dialog .p-progressbar {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+.disconnected-dialog .reconnecting {
+  align-self: center;
 }
 
 /** content */
