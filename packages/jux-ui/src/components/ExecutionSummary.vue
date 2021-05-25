@@ -1,6 +1,6 @@
 <template>
   <div class="execution-summary">
-    <div>{{reporter?.status}}</div>
+    <execution-status :reporter="reporter" />
     <div class="counters">
       <div class="counter-box failed">
         {{result.numFailedTests}} failed
@@ -16,10 +16,14 @@
 </template>
 <script>
 import pluralize from 'pluralize'
+import ExecutionStatus from './ExecutionStatus'
 
 export default {
   name: 'ExecutionSummary',
   props: ['reporter'],
+  components: {
+    ExecutionStatus,
+  },
   computed: {
     result() {
       return this.reporter?.execution?.result || {}

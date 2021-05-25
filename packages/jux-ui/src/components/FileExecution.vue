@@ -1,10 +1,11 @@
 <template>
     <div class="file-execution-title">
-        <file-path :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
-        <div v-if="file.state === 'completed'" class="file-execution-summary">
-          <file-execution-result-summary :result="file.result" />
-        </div>
-        <execution-duration :duration="file.result.perfStats.runtime" />
+        <file-path class="file-path" :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
+
+        <i v-if="isRunning" class="pi pi-spin pi-spinner" />
+
+        <file-execution-result-summary v-if="!isRunning" :result="file.result" />
+        <execution-duration v-if="!isRunning" :duration="file.result.perfStats.runtime" />
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">
@@ -18,6 +19,7 @@
 </template>
 
 <script>
+  import FileStatusType from '@/store/FileStatusType'
   import { omit, propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
   import ExecutionDuration from './ExecutionDuration'
@@ -26,7 +28,7 @@
 
   const createTestsTree = (rootDir, results) => {
     // TODO: this should probably be a logic on the state
-    const r = results.reduce((node, result) => {
+    return results.reduce((node, result) => {
       result.ancestorTitles.reduce((parent, ancestor, i) => {
         let existing = parent.children.find(propEq('title', ancestor))
         if (!existing) {
@@ -53,7 +55,6 @@
       children: [],
       tests: []
     })
-    return r
   }
 
   export default {
@@ -62,7 +63,7 @@
     emits: ['onTestSelected'],
     data() {
       return {
-        expanded: true
+        expanded: false
       }
     },
     components: {
@@ -74,12 +75,11 @@
     computed: {
       shortFile() { return omit(['context'], this.file) },
       root() {
-        return this.file.state === 'completed' ?
+        return this.file.state === FileStatusType.completed ?
           createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
       },
-      numberFailingTests() {
-        console.log('file', this.file.path, 'results', JSON.stringify(this.file.result,null,2))
-        return 0
+      isRunning() {
+        return this.file.state === FileStatusType.running
       }
     },
     methods: {

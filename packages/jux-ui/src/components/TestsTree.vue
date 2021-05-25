@@ -1,9 +1,9 @@
 <template>
     <execution-summary :reporter="reporter" />
 
-    <div v-if="result">
+    <div>
         <ul class="test-files">
-            <li v-for="file in execution.files" :key="file.path">
+            <li v-for="file in execution?.files" :key="file.path">
                 <file-execution :file="file" @on-test-selected="testSelected" />
             </li>
         </ul>
@@ -56,24 +56,34 @@
 
 
 .test-files > li:first-child .file-execution-title {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 .test-files > li:last-child .file-execution-title {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 /* FileExecution */
 
 .file-execution-title {
-    line-height: 2rem;
-    background: #f3f3f3;
-    padding-left: 1rem;
-    padding-right: 1rem;
+  line-height: 2rem;
+  background: #f3f3f3;
+  padding-left: 1rem;
+  padding-right: 1rem;
 
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  /*justify-content: space-between;*/
+}
+.file-execution-title .file-path {
+  flex-grow: 1;
+}
+.file-execution-title .pi-spinner {
+  width: 1rem;
+  height: 1rem;
+  align-self: center;
+  color: darkgray;
+  margin-right: 0.5rem;
 }
 .file-execution-elements {
   padding-right: 0.5rem;
