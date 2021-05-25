@@ -201,6 +201,11 @@ body * {
   top: 0px;
   z-index: 1;
 }
+.execution-summary .execution-status {
+  display: flex;
+  justify-content: space-around;
+  flex-grow: 1;
+}
 
 .file-execution-summary {
   display: flex;
@@ -211,6 +216,7 @@ body * {
 .execution-test-duration {
   color: gray;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .execution-children {

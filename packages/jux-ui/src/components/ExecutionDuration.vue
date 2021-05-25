@@ -1,5 +1,5 @@
 <template>
-    <span v-if="duration > 0" class="execution-test-duration">{{duration}} ms</span>
+    <span v-if="duration > 0" class="execution-test-duration">{{duration.toLocaleString()}} ms</span>
 </template>
 <script>
     export default {

@@ -1,7 +1,9 @@
 <template>
-  <span class="count-failing">{{result.numFailingTests}}</span>
-  <span class="count-pending">{{result.numPendingTests}}</span>
-  <span class="count-passed">{{result.numPassingTests}}</span>
+  <div class="file-execution-summary">
+    <span class="count-failing">{{result.numFailingTests}}</span>
+  <!--  <span class="count-pending">{{result.numPendingTests}}</span>-->
+    <span class="count-passed">{{result.numPassingTests}}</span>
+  </div>
 </template>
 <script>
 export default {
