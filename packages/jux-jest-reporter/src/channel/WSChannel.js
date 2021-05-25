@@ -39,6 +39,8 @@ class WSChannel {
     }
   }
 
+  isConnected() { return this.ws.readyState === OPEN_READY_STATE }
+
   onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
   onMessage(onMessageFn) { this._onMessageFn = onMessageFn }
   onError(onErrorFn) { this._onErrorFn = onErrorFn }

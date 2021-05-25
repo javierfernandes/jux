@@ -1,5 +1,5 @@
 const ReporterMessageType = require('./ReporterMessageType')
-const RequestHandler = require('./RequestHandler')
+const RequestHandler = require('../RequestHandler')
 
 /**
  * Kind of an SDK class to connect to "jux-service" acting as a reporter.

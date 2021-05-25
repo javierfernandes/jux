@@ -49,72 +49,6 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
-/***/ 6:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-const ReporterMessageType = __webpack_require__(484)
-const RequestHandler = __webpack_require__(899)
-
-/**
- * Kind of an SDK class to connect to "jux-service" acting as a reporter.
- * Provides a simple JS API to abstract from the communication and connection, etc.
- */
-class JuxReporterConnection {
-
-  constructor(channel, context) {
-    this.channel = channel
-    this.context = context
-
-    this.channel.onConnected(() => {
-      // send our initial info
-      this.send({
-        type: ReporterMessageType.fromReporter.IDENTIFY_REPORTER,
-        context
-      })
-    })
-
-    this.channel.onMessage(async message => {
-      const { type, id } = message
-      // console.log('RECEIVED', messageString)
-      const handler = RequestHandler[type]
-      if (handler) {
-        try {
-          const value = await handler(message, context)
-          this.reply(id, value)
-        } catch(err) {
-          // TODO: handle here
-        }
-      } else {
-        console.error(`No handler for message type ${type}`, message)
-      }
-    })
-  }
-
-  connect() {
-    this.channel.connect()
-  }
-
-  send(msg) {
-    // TODO: if not yet connected then I think that we should buffer
-    //   and send it all once connected. That will make the UI get
-    //   the initial run
-    this.channel.send(msg)
-  }
-
-  reply(id, value) {
-    this.channel.send({
-      type: ReporterMessageType.fromReporter.RESPONSE,
-      id,
-      value
-    })
-  }
-
-}
-
-module.exports = JuxReporterConnection
-
-/***/ }),
-
 /***/ 10:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -1494,18 +1428,82 @@ module.exports = eval("require")("bufferutil");
 
 /***/ }),
 
+/***/ 43:
+/***/ (function(module) {
+
+
+/**
+ * Decorates a Channel instance to support buffering "send()" calls until the channel
+ * is connected.
+ * Once it gets connected then it will send everything in order and clear the buffer.
+ * Implemented with JS Proxies to avoid re-writing the whole API.
+ * This impl is partially implemented just enough to work with the initial case but not
+ * with disconnections & reconnections. That can be added though.
+ *
+ * TODO: support getting offline on the go and online back without leaking
+ */
+const BufferingChannel = channel => new Proxy(channel, decoratorHandler(createDecorator(channel)))
+
+/**
+ * Given a channel (decoratee) returns a new object that will intercept only some
+ * of its methods.
+ * In this case `send()` to buffer if disconnected
+ */
+const createDecorator = channel => {
+  let buffer = []
+
+  // as we set our onConnected, we don't want to lose the user-level
+  let otherOnConnected;
+  channel.onConnected(() => {
+    buffer.forEach(message => channel.send(message))
+    buffer = []
+    otherOnConnected && otherOnConnected()
+  })
+
+  return {
+    send(message) {
+      if (channel.isConnected()) {
+        channel.send(message)
+      } else {
+        buffer.push(message)
+      }
+    },
+    onConnected(fn) {
+      otherOnConnected = fn
+    },
+    // added
+    getBuffer() { return buffer }
+  }
+}
+
+/**
+ * Proxy handler that first attempts to get the member from the decorator
+ * otherwise use the original object.
+ */
+const decoratorHandler = decorator => ({
+  get(obj, prop) {
+    const decorated = decorator[prop]
+    return decorated ? decorated : obj[prop]
+  }
+})
+
+module.exports = BufferingChannel
+
+/***/ }),
+
 /***/ 104:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 const JUXJestReporter = __webpack_require__(988)
-const WSChannel = __webpack_require__(590)
+const WSChannel = __webpack_require__(615)
+const BufferingChannel = __webpack_require__(43)
 const juxConnectionProvider = __webpack_require__(384)
 
 // config: maybe we should read if from the config when jest instantiates us (?)
 const JUX_SERVICE_PORT = 5326
 const JUX_PROTOCOL = 'JUX_REPORTER'
 
-const channel = new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL)
+const channel = BufferingChannel(new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL))
 channel.onError(error => {
   console.error(`
   >>>>
@@ -1515,6 +1513,72 @@ channel.onError(error => {
 })
 
 module.exports = JUXJestReporter(juxConnectionProvider(channel))
+
+/***/ }),
+
+/***/ 181:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const ReporterMessageType = __webpack_require__(238)
+const RequestHandler = __webpack_require__(899)
+
+/**
+ * Kind of an SDK class to connect to "jux-service" acting as a reporter.
+ * Provides a simple JS API to abstract from the communication and connection, etc.
+ */
+class JuxReporterConnection {
+
+  constructor(channel, context) {
+    this.channel = channel
+    this.context = context
+
+    this.channel.onConnected(() => {
+      // send our initial info
+      this.send({
+        type: ReporterMessageType.fromReporter.IDENTIFY_REPORTER,
+        context
+      })
+    })
+
+    this.channel.onMessage(async message => {
+      const { type, id } = message
+      // console.log('RECEIVED', messageString)
+      const handler = RequestHandler[type]
+      if (handler) {
+        try {
+          const value = await handler(message, context)
+          this.reply(id, value)
+        } catch(err) {
+          // TODO: handle here
+        }
+      } else {
+        console.error(`No handler for message type ${type}`, message)
+      }
+    })
+  }
+
+  connect() {
+    this.channel.connect()
+  }
+
+  send(msg) {
+    // TODO: if not yet connected then I think that we should buffer
+    //   and send it all once connected. That will make the UI get
+    //   the initial run
+    this.channel.send(msg)
+  }
+
+  reply(id, value) {
+    this.channel.send({
+      type: ReporterMessageType.fromReporter.RESPONSE,
+      id,
+      value
+    })
+  }
+
+}
+
+module.exports = JuxReporterConnection
 
 /***/ }),
 
@@ -1548,6 +1612,45 @@ WebSocket.Sender = __webpack_require__(10);
 
 module.exports = WebSocket;
 
+
+/***/ }),
+
+/***/ 238:
+/***/ (function(module) {
+
+/**
+ * API doc for the `type` field om message to/from a reporter
+ */
+const ReporterMessageType = {
+
+  toReporter: {
+    /**
+     * Receives a request from a client. Must respond with another message
+     * with type RESPONSE
+     */
+    // we never really get this type, the service unwraps it and just sent us the
+    // body which also has the type
+    // REQUEST: 'request',
+
+    FETCH_SOURCE_CODE: 'fetchSourceCode',
+
+  },
+
+  fromReporter: {
+
+    IDENTIFY_REPORTER: 'identifyReporter',
+
+    /**
+     * Send a response to a received REQUEST message
+     */
+    RESPONSE: 'response',
+
+    ON_RUN_START: 'onRunStart',
+  }
+
+}
+
+module.exports = ReporterMessageType
 
 /***/ }),
 
@@ -2962,7 +3065,7 @@ try {
 /***/ 384:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-const JuxReporterConnection = __webpack_require__(6)
+const JuxReporterConnection = __webpack_require__(181)
 
 /**
  * We instantiate and connect just once.
@@ -2999,45 +3102,6 @@ module.exports = require("stream");
 /***/ (function(module) {
 
 module.exports = require("crypto");
-
-/***/ }),
-
-/***/ 484:
-/***/ (function(module) {
-
-/**
- * API doc for the `type` field om message to/from a reporter
- */
-const ReporterMessageType = {
-
-  toReporter: {
-    /**
-     * Receives a request from a client. Must respond with another message
-     * with type RESPONSE
-     */
-    // we never really get this type, the service unwraps it and just sent us the
-    // body which also has the type
-    // REQUEST: 'request',
-
-    FETCH_SOURCE_CODE: 'fetchSourceCode',
-
-  },
-
-  fromReporter: {
-
-    IDENTIFY_REPORTER: 'identifyReporter',
-
-    /**
-     * Send a response to a received REQUEST message
-     */
-    RESPONSE: 'response',
-
-    ON_RUN_START: 'onRunStart',
-  }
-
-}
-
-module.exports = ReporterMessageType
 
 /***/ }),
 
@@ -3150,60 +3214,6 @@ try {
   };
 }
 
-
-/***/ }),
-
-/***/ 590:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-const WebSocket = __webpack_require__(237)
-
-const OPEN_READY_STATE = 1
-
-/**
- * Channel impl using websockets to connect to JUX.
- * Useful abstraction to decouple a little bit the main logic
- * from "ws" allowing better testing
- */
-class WSChannel {
-
-  constructor(port, protocol) {
-    this.port = port
-    this.protocol = protocol
-  }
-
-  connect() {
-    console.log('Connecting to JUX service...')
-
-    this.ws = new WebSocket(`ws://localhost:${this.port}/`, [this.protocol])
-
-    this.ws.on('open', () => {
-      console.log('Connected to JUX service !')
-      this._onConnectedFn()
-    })
-
-    this.ws.on('message', async messageString => {
-      this._onMessageFn(JSON.parse(messageString))
-    })
-
-    this.ws.on('error', error => {
-      this._onErrorFn(error)
-    })
-  }
-
-  send(msg) {
-    if (this.ws.readyState === OPEN_READY_STATE) {
-      this.ws.send(JSON.stringify(msg))
-    }
-  }
-
-  onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
-  onMessage(onMessageFn) { this._onMessageFn = onMessageFn }
-  onError(onErrorFn) { this._onErrorFn = onErrorFn }
-
-}
-
-module.exports = WSChannel
 
 /***/ }),
 
@@ -3632,6 +3642,62 @@ function abortHandshake(socket, code, message, headers) {
 /***/ (function(module) {
 
 module.exports = require("events");
+
+/***/ }),
+
+/***/ 615:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+const WebSocket = __webpack_require__(237)
+
+const OPEN_READY_STATE = 1
+
+/**
+ * Channel impl using websockets to connect to JUX.
+ * Useful abstraction to decouple a little bit the main logic
+ * from "ws" allowing better testing
+ */
+class WSChannel {
+
+  constructor(port, protocol) {
+    this.port = port
+    this.protocol = protocol
+  }
+
+  connect() {
+    console.log('Connecting to JUX service...')
+
+    this.ws = new WebSocket(`ws://localhost:${this.port}/`, [this.protocol])
+
+    this.ws.on('open', () => {
+      console.log('Connected to JUX service !')
+      this._onConnectedFn()
+    })
+
+    this.ws.on('message', async messageString => {
+      this._onMessageFn(JSON.parse(messageString))
+    })
+
+    this.ws.on('error', error => {
+      this._onErrorFn(error)
+    })
+  }
+
+  send(msg) {
+    if (this.ws.readyState === OPEN_READY_STATE) {
+      this.ws.send(JSON.stringify(msg))
+    }
+  }
+
+  isConnected() { return this.ws.readyState === OPEN_READY_STATE }
+
+  onConnected(onConnectedFn) { this._onConnectedFn = onConnectedFn }
+  onMessage(onMessageFn) { this._onMessageFn = onMessageFn }
+  onError(onErrorFn) { this._onErrorFn = onErrorFn }
+
+}
+
+module.exports = WSChannel
 
 /***/ }),
 

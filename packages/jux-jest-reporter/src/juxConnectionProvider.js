@@ -1,4 +1,4 @@
-const JuxReporterConnection = require('./JuxReporterConnection')
+const JuxReporterConnection = require('./api/JuxReporterConnection')
 
 /**
  * We instantiate and connect just once.

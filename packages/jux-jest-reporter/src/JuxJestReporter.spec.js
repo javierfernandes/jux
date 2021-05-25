@@ -1,9 +1,8 @@
 const { always } = require('ramda')
 const classFactory = require('./JuxJestReporter')
-const juxConnectionProvider = require('./juxConnectionProvider')
-const MockChannel = require('./MockChannel')
-const ReporterMessageType = require('./ReporterMessageType')
-const JuxReporterConnection = require('./JuxReporterConnection')
+const MockChannel = require('./channel/MockChannel')
+const ReporterMessageType = require('./api/ReporterMessageType')
+const JuxReporterConnection = require('./api/JuxReporterConnection')
 
 describe('JuxJestReporter', () => {
 
