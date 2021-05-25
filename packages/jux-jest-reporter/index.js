@@ -1,12 +1,13 @@
 const JUXJestReporter = require('./src/JUXJestReporter')
-const WSChannel = require('./src/WSChannel')
+const WSChannel = require('./src/channel/WSChannel')
+const BufferingChannel = require('./src/channel/BufferingChannel')
 const juxConnectionProvider = require('./src/juxConnectionProvider')
 
 // config: maybe we should read if from the config when jest instantiates us (?)
 const JUX_SERVICE_PORT = 5326
 const JUX_PROTOCOL = 'JUX_REPORTER'
 
-const channel = new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL)
+const channel = BufferingChannel(new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL))
 channel.onError(error => {
   console.error(`
   >>>>
