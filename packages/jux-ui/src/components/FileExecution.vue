@@ -1,6 +1,11 @@
 <template>
     <div class="file-execution-title">
-        <file-path class="file-path" :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
+        <file-path
+            :class="`file-path ${isFailed ? 'file-path-failed' : ''}`"
+            :path="file.path"
+            :root="file.context.config.rootDir"
+            @toggle="toggle"
+        />
 
         <i v-if="isRunning" class="pi pi-spin pi-spinner" />
 
@@ -74,12 +79,18 @@
     },
     computed: {
       shortFile() { return omit(['context'], this.file) },
+      isCompleted() {
+        return this.file.state === FileStatusType.completed
+      },
       root() {
-        return this.file.state === FileStatusType.completed ?
+        return this.isCompleted ?
           createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
       },
       isRunning() {
         return this.file.state === FileStatusType.running
+      },
+      isFailed() {
+        return this.isCompleted && this.file.result?.numFailingTests > 0
       }
     },
     methods: {

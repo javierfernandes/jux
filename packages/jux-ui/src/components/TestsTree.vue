@@ -78,6 +78,9 @@
 .file-execution-title .file-path {
   flex-grow: 1;
 }
+.file-execution-title .file-path.file-path-failed {
+  color: var(--failed-primary-color);
+}
 .file-execution-title .pi-spinner {
   width: 1rem;
   height: 1rem;

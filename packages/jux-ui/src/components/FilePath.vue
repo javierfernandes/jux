@@ -11,7 +11,7 @@ export default {
   props: ['path', 'root', 'class'],
   computed: {
     folder() {
-      return this.path.slice(this.root.length, this.path.lastIndexOf('/') + 1)
+      return this.path.slice(this.root.length + 1, this.path.lastIndexOf('/') + 1)
     },
     fileName() {
       return this.path.slice(this.path.lastIndexOf('/') + 1)

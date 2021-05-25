@@ -163,7 +163,7 @@ body * {
 .content-splitter {
   height: 93vh;
 }
-.content-splitter .p-splitter-panel {
+.content-splitter .p-splitter-panel:first-child {
   overflow: scroll;
 }
 
@@ -249,6 +249,16 @@ body * {
   color: var(--failed-primary-color);
 }
 
+.test-detail {
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.test-detail .test-detail-header {
+  border-bottom: 4px solid #f8f9fa;
+  position: sticky;
+}
+
 .test-detail .p-breadcrumb {
   border: 0;
   border-bottom: 2px solid #f8f9fa;
@@ -262,14 +272,15 @@ body * {
 }
 
 .test-detail-content {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   height: 100%;
   overflow: scroll;
 }
 .test-detail .test-title {
   display: flex;
   align-items: center;
+  padding-left: 2rem;
 }
 .test-detail .test-title .test-status {
   width: 1rem;
