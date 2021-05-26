@@ -16,12 +16,12 @@
             title="Error"
         >
           <div v-for="failure in failureMessages" :key="failure.line">
-            <failure-source-code :reporter="reporter" :failure="failure" />
             <div class="test-failure-messages-box">
               <div v-for="line in failure.lines" :key="line">
                 <div v-html="line" />
               </div>
             </div>
+            <failure-source-code :reporter="reporter" :failure="failure" />
           </div>
         </test-detail-section>
 
