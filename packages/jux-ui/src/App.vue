@@ -263,7 +263,7 @@ color: var(--failed-primary-color);
   display: inline-flex;
 }
 .execution-title.execution-title-failed {
-  color: var(--failed-primary-color);
+color: var(--failed-primary-color);
 }
 .execution-title .pi-angle-down {
   color: lightgray;
