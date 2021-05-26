@@ -163,7 +163,7 @@ body * {
 .content-splitter {
   height: 93vh;
 }
-.content-splitter .p-splitter-panel:first-child {
+.content-splitter .p-splitter-panel:nth-child(1) {
   overflow: scroll;
 }
 
@@ -217,6 +217,13 @@ body * {
   color: gray;
   font-size: 0.8rem;
   white-space: nowrap;
+}
+.execution-test-duration i {
+  font-style: normal;
+  color: darkgray;
+}
+.execution-test-duration.execution-test-duration-slow {
+  background: #e0e056;
 }
 
 .execution-children {

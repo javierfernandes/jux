@@ -1,14 +1,27 @@
 <template>
   <div class="file-execution-summary">
-    <span class="count-failing">{{result.numFailingTests}}</span>
-  <!--  <span class="count-pending">{{result.numPendingTests}}</span>-->
-    <span class="count-passed">{{result.numPassingTests}}</span>
+    <test-counter
+        icon="pi-exclamation-triangle"
+        :count="result.numFailingTests"
+        class="count-failing"
+        v-if="result.numFailingTests > 0"
+    />
+    <test-counter
+        icon="pi-check"
+        :count="result.numPassingTests"
+        class="count-passed"
+    />
+
   </div>
 </template>
 <script>
+import TestCounter from './TestCounter'
 export default {
   name: 'FileExecutionResultSummary',
-  props: ['result']
+  props: ['result'],
+  components: {
+    TestCounter,
+  }
 }
 </script>
 <style>

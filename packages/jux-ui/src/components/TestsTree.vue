@@ -70,7 +70,6 @@
   line-height: 2rem;
   background: #f3f3f3;
   padding-left: 1rem;
-  padding-right: 1rem;
 
   display: flex;
   /*justify-content: space-between;*/
@@ -88,6 +87,12 @@
   color: darkgray;
   margin-right: 0.5rem;
 }
+
+.file-execution-title .execution-test-duration {
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
 .file-execution-elements {
   padding-right: 0.5rem;
   padding-top: 0.5rem;

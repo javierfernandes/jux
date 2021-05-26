@@ -10,7 +10,11 @@
         <i v-if="isRunning" class="pi pi-spin pi-spinner" />
 
         <file-execution-result-summary v-if="!isRunning" :result="file.result" />
-        <execution-duration v-if="!isRunning" :duration="file.result.perfStats.runtime" />
+        <execution-duration
+            v-if="!isRunning"
+            :duration="file.result.perfStats.runtime"
+            :slow="file.result.perfStats.slow"
+        />
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">
