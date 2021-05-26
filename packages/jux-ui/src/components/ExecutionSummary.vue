@@ -3,6 +3,7 @@
     <execution-status :reporter="reporter" />
     <div class="counters">
       <div class="counter-box failed">
+        <i class="pi pi-exclamation-triangle" />
         {{result.numFailedTests}} failed
         <div class="counter-box-bottom-line">{{result.numFailedTestSuites}} {{failedSuitesLabel}}</div>
       </div>
@@ -57,5 +58,6 @@ export default {
 }
 .counter-box-bottom-line {
   font-size: 0.7rem;
+  text-align: end;
 }
 </style>

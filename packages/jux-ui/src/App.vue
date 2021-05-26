@@ -28,10 +28,10 @@
 
         <div class="layout-content">
           <Splitter class="content-splitter">
-            <SplitterPanel :size="35" :minSize="20">
+            <SplitterPanel :size="38" :minSize="20">
               <tests-tree :reporter="currentReporter" @on-test-selected="onTestSelected" />
             </SplitterPanel>
-            <SplitterPanel :size="65" :minSize="50">
+            <SplitterPanel :size="62" :minSize="50">
               <test-detail :reporter="currentReporter" :test="selectedTest" />
             </SplitterPanel>
           </Splitter>
@@ -165,6 +165,7 @@ body * {
 }
 .content-splitter .p-splitter-panel:nth-child(1) {
   overflow: scroll;
+  background: #f3f3f3;
 }
 
 .padded-splitter-panel.p-splitter-panel {
@@ -210,7 +211,14 @@ body * {
 .file-execution-summary {
   display: flex;
   flex-grow: 1;
-  justify-content: space-evenly;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-right: 1rem;
+}
+.file-execution-summary > div {
+  min-width: 2.4rem;
+  display: flex;
+  justify-content: space-around;
 }
 
 .execution-test-duration {
@@ -227,94 +235,94 @@ body * {
 }
 
 .execution-children {
-  padding-inline-start: 1rem;
+padding-inline-start: 1rem;
 }
 .execution-tests {
-  list-style: none;
-  padding-inline-start: 1rem;
+list-style: none;
+padding-inline-start: 1rem;
 }
 .execution-tests li {
-  line-height: 1.5rem;
+line-height: 1.5rem;
 }
 
 .execution-test {
-  display: flex;
-  justify-content: space-between;
+display: flex;
+justify-content: space-between;
 }
 .execution-test:hover {
-  cursor: pointer;
-  font-weight: bolder;
+cursor: pointer;
+font-weight: bolder;
 }
 .execution-test-failed {
-  color: var(--failed-primary-color);
+color: var(--failed-primary-color);
 }
 
 .execution-title {
-  color: gray;
+color: gray;
 }
 .execution-title.execution-title-failed {
-  color: var(--failed-primary-color);
+color: var(--failed-primary-color);
 }
 
 .test-detail {
-  overflow-y: scroll;
-  height: 100%;
+overflow-y: scroll;
+height: 100%;
 }
 
 .test-detail .test-detail-header {
-  border-bottom: 4px solid #f8f9fa;
-  position: sticky;
+border-bottom: 4px solid #f8f9fa;
+position: sticky;
 }
 
 .test-detail .p-breadcrumb {
-  border: 0;
-  border-bottom: 2px solid #f8f9fa;
-  border-radius: 0;
-  font-size: 0.8rem;
-  padding: 0.5rem;
+border: 0;
+border-bottom: 2px solid #f8f9fa;
+border-radius: 0;
+font-size: 0.8rem;
+padding: 0.5rem;
 }
 .test-detail .p-breadcrumb-chevron {
-  font-size: 0.5rem;
-  color: #c7c7c7;
+font-size: 0.5rem;
+color: #c7c7c7;
 }
 
 .test-detail-content {
-  padding-left: 2rem;
-  padding-right: 2rem;
-  height: 100%;
-  overflow: scroll;
+padding-left: 2rem;
+padding-right: 2rem;
+height: 100%;
+overflow: scroll;
 }
 .test-detail .test-title {
-  display: flex;
-  align-items: center;
-  padding-left: 2rem;
+display: flex;
+align-items: center;
+padding-left: 2rem;
 }
 .test-detail .test-title .test-status {
-  width: 1rem;
-  height: 1rem;
-  margin-right: 0.4rem;
+width: 1rem;
+height: 1rem;
+margin-right: 0.4rem;
 }
 .test-detail .test-failure-messages-box {
-  padding: 1rem;
-  background: #ffeeee;
-  border-radius: 10px;
-  font-family: monospace;
+padding: 1rem;
+background: #ffeeee;
+border-radius: 10px;
+font-family: monospace;
 }
 
 .test-status {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 20px;
+display: inline-block;
+width: 0.5rem;
+height: 0.5rem;
+border-radius: 20px;
 }
 .status-passed {
-  background: green;
+background: green;
 }
 .status-failed {
-  background: var(--failed-primary-color);
+background: var(--failed-primary-color);
 }
 .status-skipped {
-  background: gray;
+background: gray;
 }
 
 /** generic stuff */

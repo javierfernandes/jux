@@ -90,7 +90,9 @@
 
 .file-execution-title .execution-test-duration {
   padding-right: 1rem;
-  padding-left: 1rem;
+  /*padding-left: 1rem;*/
+  text-align: right;
+  min-width: 5rem;
 }
 
 .file-execution-elements {
