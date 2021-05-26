@@ -1,27 +1,34 @@
 <template>
     <div class="test-detail" v-if="test">
-      <Breadcrumb :home="home" :model="path" />
 
-      <div class="test-detail-content">
+      <div class="test-detail-header">
+        <Breadcrumb :home="home" :model="path" />
         <h2 class="test-title">
           <execution-test-status :status="test.status"/>
           {{test?.title || 'should select a test on the left'}}
         </h2>
-        <div v-if="test?.failureMessages?.length > 0">
-          <h4>Error</h4>
+      </div>
 
-            <div v-for="failure in failureMessages" :key="failure.line">
-              <failure-source-code :reporter="reporter" :failure="failure" />
-              <div class="test-failure-messages-box">
-                <div v-for="line in failure.lines" :key="line">
-                  <div v-html="line" />
-                </div>
+      <div class="test-detail-content">
+
+        <test-detail-section
+            v-if="test?.failureMessages?.length > 0"
+            title="Error"
+        >
+          <div v-for="failure in failureMessages" :key="failure.line">
+            <failure-source-code :reporter="reporter" :failure="failure" />
+            <div class="test-failure-messages-box">
+              <div v-for="line in failure.lines" :key="line">
+                <div v-html="line" />
               </div>
             </div>
-        </div>
+          </div>
+        </test-detail-section>
 
-        <div v-if="test?.failureMessages?.length > 0" class="test-failure-stack-trace">
-          <h4>Stack Trace</h4>
+        <test-detail-section
+            v-if="test?.failureMessages?.length > 0"
+            title="Stack Trace"
+        >
           <div v-for="failure in failureMessages" :key="failure.line">
             <div class="stack-trace">
               <stack-trace-frame
@@ -32,12 +39,15 @@
               />
             </div>
           </div>
-        </div>
+        </test-detail-section>
 
-        <div>
-          <h4>Raw</h4>
+        <test-detail-section
+            v-if="test?.failureMessages?.length > 0"
+            title="Raw"
+        >
           <vue-json-pretty class="json-content" :data="test" />
-        </div>
+        </test-detail-section>
+
       </div>
     </div>
 </template>
@@ -49,6 +59,7 @@ import ExecutionTestStatus from './ExecutionTestStatus'
 import AnsiUp from 'ansi_up'
 import * as stackTraceParser from 'stacktrace-parser'
 import StackTraceFrame from './StackTraceFrame'
+import TestDetailSection from './TestDetailSection'
 
 const converter = new AnsiUp()
 
@@ -61,6 +72,7 @@ export default {
     ExecutionTestStatus,
     Breadcrumb,
     VueJsonPretty,
+    TestDetailSection
   },
   methods: {
     parseErrorMessage(msg) {

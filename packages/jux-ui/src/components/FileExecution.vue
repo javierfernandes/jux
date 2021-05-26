@@ -1,11 +1,20 @@
 <template>
     <div class="file-execution-title">
-        <file-path class="file-path" :path="file.path" :root="file.context.config.rootDir" @toggle="toggle" />
+        <file-path
+            :class="`file-path ${isFailed ? 'file-path-failed' : ''}`"
+            :path="file.path"
+            :root="file.context.config.rootDir"
+            @toggle="toggle"
+        />
 
         <i v-if="isRunning" class="pi pi-spin pi-spinner" />
 
         <file-execution-result-summary v-if="!isRunning" :result="file.result" />
-        <execution-duration v-if="!isRunning" :duration="file.result.perfStats.runtime" />
+        <execution-duration
+            v-if="!isRunning"
+            :duration="file.result.perfStats.runtime"
+            :slow="file.result.perfStats.slow"
+        />
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">
@@ -15,12 +24,11 @@
             </li>
         </ul>
     </div>
-<!--    <pre>{{JSON.stringify(shortFile, null, 2) }}</pre>-->
 </template>
 
 <script>
   import FileStatusType from '@/store/FileStatusType'
-  import { omit, propEq } from 'ramda'
+  import { propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
   import ExecutionDuration from './ExecutionDuration'
   import FileExecutionResultSummary from '@/components/FileExecutionResultSummary'
@@ -73,13 +81,18 @@
       FilePath,
     },
     computed: {
-      shortFile() { return omit(['context'], this.file) },
+      isCompleted() {
+        return this.file.state === FileStatusType.completed
+      },
       root() {
-        return this.file.state === FileStatusType.completed ?
+        return this.isCompleted ?
           createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
       },
       isRunning() {
         return this.file.state === FileStatusType.running
+      },
+      isFailed() {
+        return this.isCompleted && this.file.result?.numFailingTests > 0
       }
     },
     methods: {
