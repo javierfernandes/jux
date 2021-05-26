@@ -99,6 +99,7 @@
   background-color: white;
   padding-right: 0.5rem;
   padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   margin-left: 0.4rem;
 }
 </style>

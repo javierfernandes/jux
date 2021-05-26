@@ -258,10 +258,27 @@ color: var(--failed-primary-color);
 }
 
 .execution-title {
-color: gray;
+  color: gray;
+  line-height: 1.5rem;
+  display: inline-flex;
 }
 .execution-title.execution-title-failed {
-color: var(--failed-primary-color);
+  color: var(--failed-primary-color);
+}
+.execution-title .pi-angle-down {
+  color: lightgray;
+}
+.execution-title .counters {
+  color: gray;
+  padding-left: 1rem;
+  font-size: 0.8rem;
+}
+.execution-title .counters > span {
+  padding-right: 1rem;
+}
+.execution-title .counters .pi {
+  padding-right: 0.2rem;
+  color: lightgray;
 }
 
 .test-detail {
