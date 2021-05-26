@@ -24,12 +24,11 @@
             </li>
         </ul>
     </div>
-<!--    <pre>{{JSON.stringify(shortFile, null, 2) }}</pre>-->
 </template>
 
 <script>
   import FileStatusType from '@/store/FileStatusType'
-  import { omit, propEq } from 'ramda'
+  import { propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
   import ExecutionDuration from './ExecutionDuration'
   import FileExecutionResultSummary from '@/components/FileExecutionResultSummary'
@@ -82,7 +81,6 @@
       FilePath,
     },
     computed: {
-      shortFile() { return omit(['context'], this.file) },
       isCompleted() {
         return this.file.state === FileStatusType.completed
       },
