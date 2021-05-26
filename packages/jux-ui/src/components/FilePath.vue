@@ -45,5 +45,6 @@ export default {
 }
 .file-path-name {
   font-weight: bold;
+  white-space: pre;
 }
 </style>
