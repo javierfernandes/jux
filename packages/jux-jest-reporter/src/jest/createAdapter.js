@@ -15,15 +15,21 @@ const adapter = require('./adapters/adapter')
 const createAdapter = (context, reporter) => _createAdapter(context, reporter, adapter)
 
 const _createAdapter = (context, reporter, definition) => {
-  definition.forEach(([name, paramNames]) => {
+  definition.forEach((def) => {
     // for each monkey patches a method that call jux with a "jux message"
-    reporter[name] = (...args) => {
-      reporter.justReporter.send({
-        type: name,
-        ...argsToParams(args, paramNames)
-      })
-    }
+    adaptMethod(def, reporter)
   })
+}
+
+const adaptMethod = ([nameDef, paramNames], reporter) => {
+  const methodDef = typeof nameDef === 'string' ? { name: nameDef } : nameDef
+
+  reporter[methodDef.name] = (...args) => {
+    reporter.justReporter.send({
+      type: (methodDef.transform || identity)(methodDef.name),
+      ...argsToParams(args, paramNames)
+    })
+  }
 }
 
 // for tests

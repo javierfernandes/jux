@@ -12,8 +12,10 @@ import { isEmpty } from 'ramda'
 
 export default {
   name: 'FilePath',
-  props: ['path', 'root', 'class'],
+  props: ['path', 'class'],
+  inject: ['rootDir'],
   computed: {
+    root() { return this.rootDir.value },
     folderParts() {
       return this.path.slice(this.root.length + 1, this.path.lastIndexOf('/') + 1)
           .split('/')

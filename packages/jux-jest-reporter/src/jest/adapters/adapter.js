@@ -1,5 +1,5 @@
 const { omit } = require('ramda')
-const { IGNORE, param } = require('./defs')
+const { IGNORE, param, rename } = require('./defs')
 
 // common params definitions
 
@@ -16,13 +16,16 @@ const adapter = [
   ['onRunStart', ['aggregatedResults']],
   ['onRunComplete', [IGNORE, 'results']],
 
+  // jest 26 (?)
   ['onTestFileStart', [test]],
   ['onTestFileResult', [test, 'result', 'aggregatedResult']],
+
   ['onTestCaseResult', [test, 'result']],
 
+  // TODO: support jest 24 !
   // I suspect this two are from jest 24 ! Similar to "onTestFileStart" + "onTestFileResult"
-  ['onTestStart', [test]],
-  ['onTestResult', [test, 'result', 'aggregatedResult']],
+  [rename('onTestStart', 'onTestFileStart'), [test]],
+  [rename('onTestResult', 'onTestFileResult'), [test, 'result', 'aggregatedResult']],
 
 ]
 

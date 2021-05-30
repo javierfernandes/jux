@@ -45,20 +45,20 @@ describe('JuxJestReporter', () => {
         }
       }))
 
-      it('should delegate "onTestStart"', () => doTest({
+      it('should delegate "onTestStart" renaming it', () => doTest({
         doing: reporter =>
           reporter.onTestStart(A_TEST),
         expectForwardedMessage: {
-          type: 'onTestStart',
+          type: 'onTestFileStart',
           test: A_TEST,
         }
       }))
 
-      it('should delegate "onTestResult"', () => doTest({
+      it('should delegate "onTestResult" renaming it', () => doTest({
         doing: reporter =>
           reporter.onTestResult(A_TEST, 'myResult', 'myAggregatedResult'),
         expectForwardedMessage: {
-          type: 'onTestResult',
+          type: 'onTestFileResult',
           test: A_TEST,
           result: 'myResult',
           aggregatedResult: 'myAggregatedResult',

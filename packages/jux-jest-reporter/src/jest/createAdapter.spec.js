@@ -1,6 +1,6 @@
 const { toUpper } = require('ramda')
 const createAdapter = require('./createAdapter').impl
-const { IGNORE, param } = require('./adapters/defs')
+const { IGNORE, param, rename } = require('./adapters/defs')
 
 describe('jest / createAdapter', () => {
 
@@ -113,6 +113,25 @@ describe('jest / createAdapter', () => {
         expecting: (reporter, mock) => {
           reporter.hello('Seuss')
           expect(mock).toBeCalledWith({ type: 'hello', to: 'SEUSS' })
+        }
+      })
+    })
+
+  })
+
+  describe('method declarations', () => {
+
+    it('should allow to transform the method name to a different type', () => {
+      doTest({
+        def: [
+          [rename('myMethod', 'myType'), []]
+        ],
+        expecting: (reporter, mock) => {
+          expect(reporter).toHaveProperty('myMethod')
+
+          reporter.myMethod()
+
+          expect(mock).toBeCalledWith({ type: 'myType' })
         }
       })
     })

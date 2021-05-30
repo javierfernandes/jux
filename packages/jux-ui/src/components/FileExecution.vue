@@ -3,7 +3,6 @@
         <file-path
             :class="`file-path ${isFailed ? 'file-path-failed' : ''}`"
             :path="file.path"
-            :root="file.context.config.rootDir"
             @toggle="toggle"
         />
 
@@ -69,6 +68,7 @@
     name: 'FileExecution',
     props: ['file'],
     emits: ['onTestSelected'],
+    inject: ['rootDir'],
     data() {
       return {
         expanded: false
@@ -86,7 +86,7 @@
       },
       root() {
         return this.isCompleted ?
-          createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
+          createTestsTree(this.rootDir.value, this.file.result.testResults) : undefined
       },
       isRunning() {
         return this.file.state === FileStatusType.running

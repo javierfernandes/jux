@@ -1,3 +1,4 @@
+const { always } = require('ramda')
 
 /**
  * Tells that this parameter must be ignored and not forwarded
@@ -12,8 +13,11 @@ const IGNORE = '__IGNORE__'
  */
 const param = (name, transform) => ({ name, transform })
 
+const rename = (name, to) => ({ name, transform: always(to) })
+
 //
 module.exports = {
   IGNORE,
-  param
+  param,
+  rename,
 }

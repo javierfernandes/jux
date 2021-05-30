@@ -8327,15 +8327,21 @@ const adapter = __webpack_require__(928)
 const createAdapter = (context, reporter) => _createAdapter(context, reporter, adapter)
 
 const _createAdapter = (context, reporter, definition) => {
-  definition.forEach(([name, paramNames]) => {
+  definition.forEach((def) => {
     // for each monkey patches a method that call jux with a "jux message"
-    reporter[name] = (...args) => {
-      reporter.justReporter.send({
-        type: name,
-        ...argsToParams(args, paramNames)
-      })
-    }
+    adaptMethod(def, reporter)
   })
+}
+
+const adaptMethod = ([nameDef, paramNames], reporter) => {
+  const methodDef = typeof nameDef === 'string' ? { name: nameDef } : nameDef
+
+  reporter[methodDef.name] = (...args) => {
+    reporter.justReporter.send({
+      type: (methodDef.transform || identity)(methodDef.name),
+      ...argsToParams(args, paramNames)
+    })
+  }
 }
 
 // for tests
@@ -14224,8 +14230,9 @@ try {
 /* 567 */,
 /* 568 */,
 /* 569 */
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
+const { always } = __webpack_require__(61)
 
 /**
  * Tells that this parameter must be ignored and not forwarded
@@ -14240,10 +14247,13 @@ const IGNORE = '__IGNORE__'
  */
 const param = (name, transform) => ({ name, transform })
 
+const rename = (name, to) => ({ name, transform: always(to) })
+
 //
 module.exports = {
   IGNORE,
-  param
+  param,
+  rename,
 }
 
 /***/ }),
@@ -22888,7 +22898,7 @@ module.exports = mergeWith;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 const { omit } = __webpack_require__(61)
-const { IGNORE, param } = __webpack_require__(569)
+const { IGNORE, param, rename } = __webpack_require__(569)
 
 // common params definitions
 
@@ -22905,13 +22915,16 @@ const adapter = [
   ['onRunStart', ['aggregatedResults']],
   ['onRunComplete', [IGNORE, 'results']],
 
+  // jest 26 (?)
   ['onTestFileStart', [test]],
   ['onTestFileResult', [test, 'result', 'aggregatedResult']],
+
   ['onTestCaseResult', [test, 'result']],
 
+  // TODO: support jest 24 !
   // I suspect this two are from jest 24 ! Similar to "onTestFileStart" + "onTestFileResult"
-  ['onTestStart', [test]],
-  ['onTestResult', [test, 'result', 'aggregatedResult']],
+  [rename('onTestStart', 'onTestFileStart'), [test]],
+  [rename('onTestResult', 'onTestFileResult'), [test, 'result', 'aggregatedResult']],
 
 ]
 
