@@ -6,9 +6,12 @@ const JuxReporterConnection = require('./api/JuxReporterConnection')
 
 describe('JuxJestReporter', () => {
 
+  const globalConfig = { rootDir: `${__dirname}/../` }
+
   describe('unitary', () => {
 
     describe('on events', () => {
+      const A_TEST = { name: 'myTest' }
 
       const doTest = ({ doing, expectForwardedMessage }) => {
         // mock the jux API
@@ -16,7 +19,6 @@ describe('JuxJestReporter', () => {
           send: jest.fn()
         }
         const JuxJestReporter = classFactory(always(jux))
-        const globalConfig = { global: 'config' }
         const options = { option: 'A' }
 
         const reporter = new JuxJestReporter(globalConfig, options)
@@ -45,19 +47,19 @@ describe('JuxJestReporter', () => {
 
       it('should delegate "onTestStart"', () => doTest({
         doing: reporter =>
-          reporter.onTestStart('myTest'),
+          reporter.onTestStart(A_TEST),
         expectForwardedMessage: {
           type: 'onTestStart',
-          test: 'myTest'
+          test: A_TEST,
         }
       }))
 
       it('should delegate "onTestResult"', () => doTest({
         doing: reporter =>
-          reporter.onTestResult('myTest', 'myResult', 'myAggregatedResult'),
+          reporter.onTestResult(A_TEST, 'myResult', 'myAggregatedResult'),
         expectForwardedMessage: {
           type: 'onTestResult',
-          test: 'myTest',
+          test: A_TEST,
           result: 'myResult',
           aggregatedResult: 'myAggregatedResult',
         }
@@ -65,19 +67,19 @@ describe('JuxJestReporter', () => {
 
       it('should delegate "onTestFileStart"', () => doTest({
         doing: reporter =>
-          reporter.onTestFileStart('myTest'),
+          reporter.onTestFileStart(A_TEST),
         expectForwardedMessage: {
           type: 'onTestFileStart',
-          test: 'myTest',
+          test: A_TEST,
         }
       }))
 
       it('should delegate "onTestFileStart"', () => doTest({
         doing: reporter =>
-          reporter.onTestFileResult('myTest', 'myResult', 'myAggregatedResult'),
+          reporter.onTestFileResult(A_TEST, 'myResult', 'myAggregatedResult'),
         expectForwardedMessage: {
           type: 'onTestFileResult',
-          test: 'myTest',
+          test: A_TEST,
           result: 'myResult',
           aggregatedResult: 'myAggregatedResult',
         }
@@ -85,10 +87,10 @@ describe('JuxJestReporter', () => {
 
       it('should delegate "onTestCaseResult"', () => doTest({
         doing: reporter =>
-          reporter.onTestCaseResult('myTest', 'myResult'),
+          reporter.onTestCaseResult(A_TEST, 'myResult'),
         expectForwardedMessage: {
           type: 'onTestCaseResult',
-          test: 'myTest',
+          test: A_TEST,
           result: 'myResult',
         }
       }))
@@ -109,25 +111,33 @@ describe('JuxJestReporter', () => {
     const createReporter = () => {
       const channel = new MockChannel()
       const JuxJestReporter = classFactory(provider(channel))
-      const reporter = new JuxJestReporter({ global: 'config' }, { option: 'A' })
+      const reporter = new JuxJestReporter(globalConfig, { option: 'A' })
 
       return { reporter, channel }
     }
 
-    it('should send identityReporter upon connection', () => {
+    it('should send identityReporter upon connection (contains jest version)', () => {
       const { channel } = createReporter()
 
       expect(channel.onConnected).toBeCalled()
 
       channel.simulateConnected()
 
-      expect(channel.send).toBeCalledWith({
+      expect(channel.send.mock.calls[0]).toMatchObject([{
         type: ReporterMessageType.fromReporter.IDENTIFY_REPORTER,
         context: {
-          globalConfig: { global: 'config' },
-          options: { option: 'A' }
+          globalConfig,
+          options: { option: 'A' },
+          jest: {
+            version: {
+              version: '26.6.3',
+              major: 26,
+              minor: 6,
+              patch: 3
+            }
+          }
         }
-      })
+      }])
     })
 
     it('should send onRunStart to the channel', () => {
@@ -149,7 +159,7 @@ describe('JuxJestReporter', () => {
     describe('incoming requests', () => {
 
       it('should handle "fetchSourceCode" request', async () => {
-        const { reporter, channel } = createReporter()
+        const { channel } = createReporter()
 
         channel.simulateConnected()
 

@@ -4,15 +4,18 @@ const BufferingChannel = require('./src/channel/BufferingChannel')
 const juxConnectionProvider = require('./src/juxConnectionProvider')
 
 // config: maybe we should read if from the config when jest instantiates us (?)
-const JUX_SERVICE_PORT = 5326
-const JUX_PROTOCOL = 'JUX_REPORTER'
+const CONFIG_DEFAULTS = {
+  juxServicePort: 5326,
+  juxWSProtocol: 'JUX_REPORTER',
+}
 
-const channel = BufferingChannel(new WSChannel(JUX_SERVICE_PORT, JUX_PROTOCOL))
+const channel = BufferingChannel(new WSChannel(CONFIG_DEFAULTS.juxServicePort, CONFIG_DEFAULTS.juxWSProtocol))
 channel.onError(error => {
   console.error(`
   >>>>
   >>>> ERROR connecting to JUX Service !
   >>>>   make sure the service is running
+  ${error}
   `)
 })
 
