@@ -17,7 +17,8 @@
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">
-        <ul>
+        <div class="no-elements" v-if="root.children.length === 0">No test executions</div>
+        <ul v-if="root.children.length > 0">
             <li v-for="node in root.children" :key="node.title">
                 <execution-node :node="node" @on-test-selected="onTestSelected" />
             </li>
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+  import { isFailed } from '@/model/FileExecution'
   import FileStatusType from '@/store/FileStatusType'
   import { propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
@@ -92,7 +94,7 @@
         return this.file.state === FileStatusType.running
       },
       isFailed() {
-        return this.isCompleted && this.file.result?.numFailingTests > 0
+        return this.isCompleted && isFailed(this.file)
       }
     },
     methods: {

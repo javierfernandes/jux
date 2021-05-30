@@ -110,4 +110,9 @@
   padding-bottom: 0.5rem;
   margin-left: 0.4rem;
 }
+.file-execution-elements .no-elements {
+  margin-left: 2rem;
+  font-size: 0.9rem;
+  color: gray;
+}
 </style>
