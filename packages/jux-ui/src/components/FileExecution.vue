@@ -3,7 +3,6 @@
         <file-path
             :class="`file-path ${isFailed ? 'file-path-failed' : ''}`"
             :path="file.path"
-            :root="file.context.config.rootDir"
             @toggle="toggle"
         />
 
@@ -18,7 +17,8 @@
     </div>
 
     <div v-if="root && expanded" class="file-execution-elements">
-        <ul>
+        <div class="no-elements" v-if="root.children.length === 0">No test executions</div>
+        <ul v-if="root.children.length > 0">
             <li v-for="node in root.children" :key="node.title">
                 <execution-node :node="node" @on-test-selected="onTestSelected" />
             </li>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  import { isFailed } from '@/model/FileExecution'
   import FileStatusType from '@/store/FileStatusType'
   import { propEq } from 'ramda'
   import ExecutionNode from './ExecutionNode'
@@ -69,6 +70,7 @@
     name: 'FileExecution',
     props: ['file'],
     emits: ['onTestSelected'],
+    inject: ['rootDir'],
     data() {
       return {
         expanded: false
@@ -86,13 +88,13 @@
       },
       root() {
         return this.isCompleted ?
-          createTestsTree(this.file.context.config.rootDir, this.file.result.testResults) : undefined
+          createTestsTree(this.rootDir.value, this.file.result.testResults) : undefined
       },
       isRunning() {
         return this.file.state === FileStatusType.running
       },
       isFailed() {
-        return this.isCompleted && this.file.result?.numFailingTests > 0
+        return this.isCompleted && isFailed(this.file)
       }
     },
     methods: {

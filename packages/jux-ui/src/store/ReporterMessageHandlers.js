@@ -23,6 +23,9 @@ const ReporterMessageHandlers = {
   // test events
 
   [ReporterMessageType.onRunStart]: (state, reporterId, { aggregatedResults }) => {
+    // reset selection that might be outdated
+    state.test = undefined
+
     state.reporters[reporterId].status = ReporterStatusType.running
     // make a new execution
     state.reporters[reporterId].execution = {

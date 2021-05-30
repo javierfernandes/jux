@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'TestCounter',
-  props: ['icon', 'count']
+  props: ['class', 'icon', 'count']
 }
 </script>
 <style>

@@ -1,7 +1,8 @@
+const createContext = require('./jest/createContext')
+const createAdapter = require('./jest/createAdapter')
 
 /**
  * Class factory for the JustJexReporter.
- *
  */
 module.exports = juxReporterProvider => {
 
@@ -12,51 +13,14 @@ module.exports = juxReporterProvider => {
   return class JUXJestReporter {
 
     constructor(globalConfig, options) {
+      this.context = createContext(globalConfig, options)
 
-      this.justReporter = juxReporterProvider({
-        globalConfig,
-        options
-      });
+      this.justReporter = juxReporterProvider(this.context)
 
-      // create delegating methods
-      [
-
-        ['onRunStart', ['aggregatedResults']],
-        ['onRunComplete', [IGNORE, 'results']],
-        ['onTestStart', ['test']],
-        ['onTestResult', ['test', 'result', 'aggregatedResult']],
-        ['onTestFileStart', ['test']],
-        ['onTestFileResult', ['test', 'result', 'aggregatedResult']],
-        ['onTestCaseResult', ['test', 'result']],
-
-      ].forEach(([name, paramNames]) => {
-        this[name] = (...args) => {
-          this.justReporter.send({
-            type: name,
-            ...argsToParams(args, paramNames)
-          })
-        }
-      })
+      // create delegating methods that "adapt" jest to JUX events
+      createAdapter(this.context, this)
     }
 
   }
 
 }
-
-//
-// forwarding utils
-//
-
-const IGNORE = '__IGNORE__'
-
-/**
- * Given a list of argument values and a list of param names creates an object
- * Naming the args and using the arg values.
- * Ignores those params having IGNORE name
- */
-const argsToParams = (args, paramNames) => paramNames.reduce((acc, paramName, i) => {
-  if (paramName !== IGNORE) {
-    acc[paramName] = args[i]
-  }
-  return acc
-}, {})

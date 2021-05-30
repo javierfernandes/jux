@@ -10,6 +10,7 @@
     </div>
 </template>
 <script>
+    import { computed } from 'vue'
     import ExecutionSummary from '@/components/ExecutionSummary'
     import FileExecution from './FileExecution'
 
@@ -27,6 +28,13 @@
         },
         result() {
           return this.execution?.result
+        }
+      },
+      provide() {
+        const rootDir = computed(() => this.reporter?.context.globalConfig.rootDir)
+        console.log('Providing rootDir', rootDir)
+        return {
+          rootDir,
         }
       },
       methods: {
@@ -101,5 +109,10 @@
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   margin-left: 0.4rem;
+}
+.file-execution-elements .no-elements {
+  margin-left: 2rem;
+  font-size: 0.9rem;
+  color: gray;
 }
 </style>
